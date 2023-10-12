@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grey_darker"
+    tools:context=".activity.ListComicNewActivity">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_default" />
+
+    <View
+        android:id="@+id/line"
+        android:layout_below="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/spacing_2dp"
+        android:background="@drawable/shadow" />
+
+    <RelativeLayout
+        android:id="@+id/searchLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/layoutFilterNow"
+        android:layout_below="@+id/line"
+        android:layout_marginTop="@dimen/spacing_10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/rounded_bg_8dp_with_line_grey"
+        android:backgroundTint="@color/white"
+        android:visibility="gone"
+        android:layout_gravity="center_vertical"
+        >
+
+        <ImageView
+            android:id="@+id/buttonSearch"
+            android:layout_width="@dimen/icon_20dp"
+            android:layout_height="@dimen/icon_20dp"
+            android:src="@drawable/ic_baseline_search_24"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/spacing_10dp"
+            app:tint="@color/grey_darker" />
+
+        <EditText
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/spacing_40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/spacing_10dp"
+            android:layout_marginRight="@dimen/spacing_10dp"
+            android:layout_toRightOf="@+id/buttonSearch"
+            android:layout_toLeftOf="@+id/btnClear"
+            android:background="@null"
+            android:gravity="center_vertical"
+            android:hint="Pencarian..."
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:textColorHint="@color/grey"
+            android:textSize="@dimen/text_size_normal" />
+
+        <ImageView
+            android:id="@+id/btnClear"
+            android:visibility="gone"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_width="@dimen/icon_20dp"
+            android:layout_height="@dimen/icon_20dp"
+            android:layout_marginRight="10dp"
+            app:tint="@color/grey_darker"
+            android:src="@drawable/ic_baseline_close_24"
+            />
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/layoutFilterNow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/line"
+        android:layout_marginTop="@dimen/spacing_10dp"
+        android:layout_marginBottom="@dimen/spacing_10dp"
+        android:layout_marginRight="10dp"
+        android:padding="10dp"
+        android:background="@drawable/rounded_bg_8dp_with_line_grey"
+        android:backgroundTint="@color/white"
+        android:visibility="gone"
+        android:layout_gravity="center_vertical"
+        >
+        <ImageView
+            android:id="@+id/btnFilterNow"
+            android:layout_width="@dimen/icon_20dp"
+            android:layout_height="@dimen/icon_20dp"
+            app:tint="@color/grey_darker"
+            android:src="@drawable/ic_baseline_filter_list_24"
+            />
+        <LinearLayout
+            android:id="@+id/pointFilter"
+            android:layout_alignRight="@+id/btnFilterNow"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:visibility="gone"
+            android:background="@drawable/circle_background_primary"
+            android:backgroundTint="@color/red"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textGenre"
+        android:layout_below="@+id/searchLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Genre : "
+        android:textSize="@dimen/text_size_normal"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textColor="@color/white"
+        />
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textGenre">
+        <RelativeLayout
+            android:id="@+id/layoutData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <View
+                android:id="@+id/topLine"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/revListData"
+                android:layout_below="@+id/topLine"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginStart="7dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="7dp"
+                android:layout_marginBottom="3dp"
+                android:overScrollMode="always" />
+        </RelativeLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <RelativeLayout
+        android:id="@+id/inputLinkLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_below="@+id/searchLayout"
+        android:layout_marginTop="@dimen/spacing_10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/rounded_bg_8dp_with_line_grey"
+        android:backgroundTint="@color/white"
+        android:visibility="gone"
+        android:layout_gravity="center_vertical"
+        >
+
+        <ImageView
+            android:id="@+id/buttonSearchLink"
+            android:layout_width="@dimen/icon_20dp"
+            android:layout_height="@dimen/icon_20dp"
+            android:src="@drawable/ic_baseline_search_24"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/spacing_10dp"
+            app:tint="@color/grey_darker" />
+
+        <EditText
+            android:id="@+id/inputLink"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/spacing_40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/spacing_10dp"
+            android:layout_marginRight="@dimen/spacing_10dp"
+            android:layout_toRightOf="@+id/buttonSearchLink"
+            android:layout_toLeftOf="@+id/btnClearLink"
+            android:background="@null"
+            android:gravity="center_vertical"
+            android:hint="Masukkan Link Url"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:textColorHint="@color/grey"
+            android:textSize="@dimen/text_size_normal" />
+
+        <ImageView
+            android:id="@+id/btnClearLink"
+            android:visibility="gone"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_width="@dimen/icon_20dp"
+            android:layout_height="@dimen/icon_20dp"
+            android:layout_marginRight="10dp"
+            app:tint="@color/grey_darker"
+            android:src="@drawable/ic_baseline_close_24"
+            />
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:visibility="visible"
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <TextView
+        android:id="@+id/textDataNotFound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Data Tidak Detemukan"
+        android:layout_centerInParent="true"
+        android:textSize="@dimen/text_size_normal"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:textColor="@color/grey"
+        />
+    <RelativeLayout
+        android:id="@+id/openPageLinkLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_below="@+id/textDataNotFound"
+        android:layout_marginTop="@dimen/spacing_15dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_centerHorizontal="true"
+        android:padding="10dp"
+        android:gravity="center"
+        android:background="@drawable/rounded_bg_8dp_with_line_primary"
+        android:visibility="gone"
+        android:layout_gravity="center_vertical"
+        >
+
+        <ImageView
+            android:id="@+id/iconSearchLink"
+            android:layout_width="@dimen/icon_15dp"
+            android:layout_height="@dimen/icon_15dp"
+            android:src="@drawable/ic_baseline_search_24"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/spacing_10dp"
+            app:tint="@color/color_primary" />
+
+        <TextView
+            android:id="@+id/textOpenPageLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/spacing_10dp"
+            android:layout_marginRight="@dimen/spacing_10dp"
+            android:layout_toRightOf="@+id/iconSearchLink"
+            android:gravity="center_vertical"
+            android:text="Buka Halaman Link"
+            android:textColor="@color/color_primary"
+            android:textSize="@dimen/text_size_normal" />
+    </RelativeLayout>
+
+</RelativeLayout>

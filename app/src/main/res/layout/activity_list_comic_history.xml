@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grey_darker"
+    tools:context=".activity.ListComicHistoryOrBookmarkActivity">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+    <View
+        android:id="@+id/line"
+        android:layout_below="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/spacing_2dp"
+        android:background="@drawable/shadow" />
+    <ProgressBar
+        android:id="@+id/progress"
+        android:visibility="visible"
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+    <TextView
+        android:id="@+id/textDataNotFound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Riwayat Tidak Detemukan"
+        android:layout_centerInParent="true"
+        android:textSize="@dimen/text_size_normal"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:textColor="@color/grey"
+        />
+
+    <RelativeLayout
+        android:id="@+id/layoutData"
+        android:layout_below="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+        <RelativeLayout
+            android:id="@+id/searchLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="@dimen/spacing_10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="@dimen/spacing_5dp"
+            android:background="@drawable/rounded_bg_8dp_with_line_grey"
+            android:backgroundTint="@color/white"
+            android:layout_gravity="center_vertical"
+            >
+
+            <ImageView
+                android:id="@+id/buttonSearch"
+                android:layout_width="@dimen/icon_15dp"
+                android:layout_height="@dimen/icon_15dp"
+                android:src="@drawable/ic_baseline_search_24"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/spacing_10dp"
+                app:tint="@color/grey_darker" />
+
+            <EditText
+                android:id="@+id/search"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/spacing_40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/spacing_10dp"
+                android:layout_marginRight="@dimen/spacing_10dp"
+                android:layout_toRightOf="@+id/buttonSearch"
+                android:layout_toLeftOf="@+id/btnClear"
+                android:background="@null"
+                android:gravity="center_vertical"
+                android:hint="Pencarian..."
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:textColorHint="@color/grey"
+                android:textSize="@dimen/text_size_normal" />
+
+            <ImageView
+                android:id="@+id/btnClear"
+                android:visibility="gone"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_width="@dimen/icon_20dp"
+                android:layout_height="@dimen/icon_20dp"
+                android:layout_marginRight="10dp"
+                app:tint="@color/grey_darker"
+                android:src="@drawable/ic_baseline_close_24"
+                />
+
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/revListData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/searchLayout"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:overScrollMode="always" />
+    </RelativeLayout>
+</RelativeLayout>

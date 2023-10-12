@@ -1,0 +1,114 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-platform-android'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'realm-android'
+
+android {
+    namespace 'mapan.prototype.mapanbacakomik'
+//    compileSdkVersion 33
+//    buildToolsVersion "33.0.1"
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "mapan.prototype.mapanbacakomik"
+        minSdk 21
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.10"
+    implementation 'androidx.core:core-ktx:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation 'androidx.multidex:multidex:2.0.0'
+    //Used to async operations
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.20'
+
+    implementation "androidx.annotation:annotation:1.0.0"
+
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation "com.mikepenz:iconics-core:5.1.1"
+    implementation "com.mikepenz:iconics-views:5.1.1"
+    implementation "com.mikepenz:fastadapter:5.3.1"
+    implementation "com.mikepenz:fastadapter-extensions-expandable:5.3.1"
+    implementation "com.mikepenz:fastadapter-extensions-binding:5.3.1" // view binding helpers
+//    implementation "com.mikepenz:fastadapter-extensions-diff:${latestFastAdapterRelease}" // diff util helpers
+    implementation "com.mikepenz:fastadapter-extensions-drag:5.3.1" // drag support
+//    implementation "com.mikepenz:fastadapter-extensions-paged:${latestFastAdapterRelease}" // paging support
+//    implementation "com.mikepenz:fastadapter-extensions-scroll:${latestFastAdapterRelease}" // scroll helpers
+    implementation "com.mikepenz:fastadapter-extensions-swipe:5.3.1" // swipe support
+//    implementation "com.mikepenz:fastadapter-extensions-ui:5.2.4" // pre-defined ui components
+    implementation "com.mikepenz:fastadapter-extensions-utils:5.3.1" // needs the `expandable`, `drag` and `scroll` extension.
+    implementation "com.mikepenz:fastadapter-extensions-diff:5.3.1" // diff util helpers
+
+    implementation("com.mikepenz:materialdrawer-iconics:8.2.0") {
+        exclude module: "fastadapter"
+        exclude module: "fastadapter-extensions-expandable"
+    }
+
+    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.1.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.11.0'
+    implementation 'jp.wasabeef:glide-transformations:4.3.0'
+
+    implementation 'com.github.MikeOrtiz:TouchImageView:1.4.1'
+    implementation 'com.karumi:dexter:6.2.1'
+    implementation 'org.sufficientlysecure:html-textview:4.0'
+
+    implementation 'org.jsoup:jsoup:1.15.4'
+
+    implementation 'com.github.Kelvao:CloudflareScrape:0.2.0'
+
+    implementation 'io.realm:android-adapters:3.0.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.1'
+    implementation 'com.quiph.ui:recyclerviewfastscroller:1.0.0'
+}

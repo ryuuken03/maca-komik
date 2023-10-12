@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:gravity="center"
+    android:layout_gravity="center|top"
+    >
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_bg_10dp"
+        android:layout_gravity="center"
+        android:paddingLeft="@dimen/spacing_20dp"
+        android:paddingRight="@dimen/spacing_20dp"
+        android:paddingTop="@dimen/spacing_20dp"
+        android:paddingBottom="@dimen/spacing_15dp"
+        >
+
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_super_normal"
+            android:gravity="left"
+            android:layout_gravity="left"
+            android:textStyle="bold"
+            android:textColor="@color/grey_darker"
+            android:text="Sample"
+            />
+
+        <TextView
+            android:id="@+id/textDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_marginTop="@dimen/spacing_10dp"
+            android:gravity="left"
+            android:layout_gravity="left"
+            android:textColor="@color/grey_dark"
+            android:text="Apakah kamu yakin ingin keluar?"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/spacing_25dp"
+            android:gravity="right"
+            >
+            <TextView
+                android:id="@+id/buttonCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:minWidth="@dimen/spacing_50dp"
+                android:text="@string/text_cancel"
+                android:textAllCaps="true"
+                android:textColor="@color/black"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:textSize="@dimen/text_size_normal"
+                android:textStyle="bold"
+                />
+
+            <TextView
+                android:id="@+id/buttonSend"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:minWidth="@dimen/spacing_50dp"
+                android:text="@string/text_ok"
+                android:textAllCaps="true"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:textSize="@dimen/text_size_normal"
+                android:textStyle="bold"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

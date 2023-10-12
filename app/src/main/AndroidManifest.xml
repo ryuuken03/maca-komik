@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+<!--    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+    <uses-permission-sdk-23 android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission-sdk-23 android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- permission tiramissu sdk33 -->
+
+    <application
+        android:name=".MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:largeHeap="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".activity.SplashActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.ListComicNewActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.ListComicByGenreActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.HomeActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.DetailComicActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.ListChapterPageActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.FilterActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.GenreActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.ChangeSourceWebsiteActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.ListComicHistoryOrBookmarkActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.ListComicProjectActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.PreviewImageActivity"
+            android:exported="false"/>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="mapan.prototype.mapanbacakomik.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>

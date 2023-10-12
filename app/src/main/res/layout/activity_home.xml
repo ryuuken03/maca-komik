@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grey_darker"
+    tools:context=".activity.HomeActivity">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_home3" />
+
+    <View
+        android:id="@+id/line"
+        android:layout_below="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/spacing_2dp"
+        android:background="@drawable/shadow" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/line">
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:id="@+id/layoutData"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+                <View
+                    android:id="@+id/topLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/textPopular"
+                    android:layout_below="@+id/topLine"
+                    android:layout_toLeftOf="@+id/btnProject"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:text="Populer Hari Ini"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/text_size_super_normal"/>
+
+                <LinearLayout
+                    android:id="@+id/btnProject"
+                    android:layout_below="@+id/topLine"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/rounded_bg_4dp_red_dark"
+                    android:backgroundTint="@color/color_primary"
+                    android:paddingLeft="@dimen/spacing_10dp"
+                    android:paddingRight="@dimen/spacing_10dp"
+                    android:paddingTop="@dimen/spacing_5dp"
+                    android:paddingBottom="@dimen/spacing_5dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="10dp"
+                    android:visibility="gone"
+                    >
+                    <TextView
+                        android:id="@+id/textProject"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Proyek"
+                        android:textSize="@dimen/text_size_small"
+                        android:textStyle="bold"
+                        android:textColor="@color/grey_darker"
+                        />
+
+                    <ImageView
+                        android:id="@+id/imgNext"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_baseline_navigate_next_24"
+                        android:visibility="visible"
+                        app:tint="@color/grey_darker"/>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/revListPopular"
+                    android:layout_below="@+id/textPopular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="7dp"
+                    android:layout_marginBottom="3dp"
+                    android:overScrollMode="always" />
+                <TextView
+                    android:id="@+id/textProjectAll"
+                    android:layout_below="@+id/revListPopular"
+                    android:background="@drawable/rounded_bg_4dp_with_line_primary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:padding="15dp"
+                    android:text="Proyek"
+                    android:textAllCaps="true"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textColor="@color/color_primary"
+                    android:textSize="@dimen/text_size_normal"/>
+
+                <TextView
+                    android:id="@+id/textGenre"
+                    android:layout_toLeftOf="@+id/btnShowOtherGenre"
+                    android:layout_below="@+id/textProjectAll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:text="Genre Komik"
+                    android:visibility="gone"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/text_size_super_normal"/>
+
+                <LinearLayout
+                    android:id="@+id/btnShowOtherGenre"
+                    android:layout_below="@+id/textProjectAll"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/rounded_bg_4dp_red_dark"
+                    android:backgroundTint="@color/color_primary"
+                    android:paddingLeft="@dimen/spacing_10dp"
+                    android:paddingRight="@dimen/spacing_10dp"
+                    android:paddingTop="@dimen/spacing_5dp"
+                    android:paddingBottom="@dimen/spacing_5dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginRight="10dp"
+                    android:visibility="gone"
+                    >
+
+                    <TextView
+                        android:id="@+id/textOtherGenre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lainnya"
+                        android:textSize="@dimen/text_size_small"
+                        android:textStyle="bold"
+                        android:textColor="@color/grey_darker"
+                        />
+
+                    <ImageView
+                        android:id="@+id/imgNext3"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_baseline_navigate_next_24"
+                        android:visibility="visible"
+                        app:tint="@color/grey_darker"/>
+                </LinearLayout>
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/revListDataGenre"
+                    android:layout_below="@+id/textGenre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="7dp"
+                    android:layout_marginBottom="3dp"
+                    android:overScrollMode="always" />
+
+                <TextView
+                    android:id="@+id/textGenreAll"
+                    android:layout_below="@+id/revListDataGenre"
+                    android:background="@drawable/rounded_bg_4dp_with_line_primary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:padding="15dp"
+                    android:text="Semua Genre"
+                    android:textAllCaps="true"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textColor="@color/color_primary"
+                    android:textSize="@dimen/text_size_normal"/>
+
+                <TextView
+                    android:id="@+id/textUpdate"
+                    android:layout_toLeftOf="@+id/btnShowAll"
+                    android:layout_below="@+id/textGenreAll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:text="Komik Terbaru"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/text_size_super_normal"/>
+
+                <LinearLayout
+                    android:id="@+id/btnShowAll"
+                    android:layout_below="@+id/textGenreAll"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_bg_4dp_red_dark"
+                    android:backgroundTint="@color/color_primary"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/spacing_10dp"
+                    android:paddingRight="@dimen/spacing_10dp"
+                    android:paddingTop="@dimen/spacing_5dp"
+                    android:paddingBottom="@dimen/spacing_5dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginRight="10dp"
+                    android:visibility="gone"
+                    >
+
+                    <TextView
+                        android:id="@+id/textShowAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Semua"
+                        android:textSize="@dimen/text_size_small"
+                        android:textStyle="bold"
+                        android:textColor="@color/grey_darker"
+                        />
+
+                    <ImageView
+                        android:id="@+id/imgNext2"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_baseline_navigate_next_24"
+                        android:visibility="visible"
+                        app:tint="@color/grey_darker"/>
+                </LinearLayout>
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/revListData"
+                    android:layout_below="@+id/textUpdate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="7dp"
+                    android:layout_marginBottom="3dp"
+                    android:overScrollMode="always" />
+
+
+                <ProgressBar
+                    android:id="@+id/progressLoadMore"
+                    android:layout_below="@+id/revListData"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    />
+                <TextView
+                    android:id="@+id/textComicAll"
+                    android:layout_below="@+id/revListData"
+                    android:background="@drawable/rounded_bg_4dp_with_line_primary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:padding="15dp"
+                    android:text="Lihat Semua"
+                    android:textAllCaps="true"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textColor="@color/color_primary"
+                    android:textSize="@dimen/text_size_normal"/>
+
+            </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:visibility="visible"
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <TextView
+        android:id="@+id/textDataNotFound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Data Tidak Detemukan"
+        android:layout_centerInParent="true"
+        android:textSize="@dimen/text_size_normal"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:textColor="@color/grey"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/openFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="25dp"
+        android:src="@drawable/ic_baseline_add_24"
+        app:fabSize="normal" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/openBookmarks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/openFAB"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/ic_baseline_bookmarks_24"
+        android:visibility="gone"
+        app:fabSize="normal" />
+    <TextView
+        android:id="@+id/textOpenBookmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="15dp"
+        android:text="Bookmark"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:textSize="@dimen/text_size_small"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:background="@color/grey_dark_soft"
+        android:layout_toLeftOf="@+id/openBookmarks"
+        android:layout_above="@+id/openFAB"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/baseline_history_24"
+        android:visibility="gone"
+        app:fabSize="normal"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/openBookmarks"/>
+    <TextView
+        android:id="@+id/textHistroy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="15dp"
+        android:text="Riwayat"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:textSize="@dimen/text_size_small"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:background="@color/grey_dark_soft"
+        android:layout_toLeftOf="@+id/history"
+        android:layout_above="@+id/openBookmarks"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/changeSource"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/ic_world"
+        android:visibility="gone"
+        app:fabSize="normal"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/history"/>
+    <TextView
+        android:id="@+id/textChangeSource"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="15dp"
+        android:text="Sumber MACA"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:textSize="@dimen/text_size_small"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:background="@color/grey_dark_soft"
+        android:layout_toLeftOf="@+id/changeSource"
+        android:layout_above="@+id/history"/>
+
+</RelativeLayout>

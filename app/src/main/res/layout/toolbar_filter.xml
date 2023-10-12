@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbarCustomWhite"
+    android:layout_width="match_parent"
+    android:layout_height="?actionBarSize"
+    android:background="@color/white"
+    android:minHeight="?attr/actionBarSize"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_baseline_chevron_left_24"
+        android:layout_marginLeft="@dimen/spacing_5dp"
+        android:textColor="@color/grey_darker"
+        />
+    <TextView
+        android:id="@+id/title"
+        android:layout_toRightOf="@+id/btnBack"
+        android:layout_toLeftOf="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/spacing_15dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="@color/grey_darker"
+        android:textSize="@dimen/text_size_big"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/spacing_15dp"
+        android:text="Simpan"
+        android:textColor="@color/grey_darker"
+        android:textSize="@dimen/text_size_super_normal"
+        android:textStyle="bold"
+        />
+
+</RelativeLayout>

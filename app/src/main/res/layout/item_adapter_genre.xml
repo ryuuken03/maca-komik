@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_adapter_genre"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginLeft="5dp"
+    >
+
+    <RelativeLayout
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:background="@drawable/rounded_bg_4dp_red_dark"
+        android:backgroundTint="@color/color_primary"
+        android:padding="5dp"
+        >
+        <TextView
+            android:id="@+id/genre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/grey_darker"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_centerVertical="true"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+            android:id="@+id/next"
+            android:layout_toRightOf="@+id/genre"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/baseline_arrow_right_alt_24"
+            android:tint="@color/grey_darker"
+            android:visibility="gone"
+            android:layout_marginLeft="@dimen/spacing_5dp"
+            />
+    </RelativeLayout>
+
+</RelativeLayout>

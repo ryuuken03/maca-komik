@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">MACA</string>
+    <string name="text_cancel">Batal</string>
+    <string name="text_ok">OK</string>
+    <string name="text_warning">Peringatan</string>
+    <string name="text_attention">Perhatian</string>
+    <string name="text_confirmation">Konfirmasi</string>
+    <string name="text_success">Sukses</string>
+    <string name="text_loading">Memuat. . .</string>
+    <string name="action_try_again">Coba lagi</string>
+    <string name="error_rto">Permintaan time out!</string>
+    <string name="error_server">Gagal terhubung ke server API!</string>
+
+    <string name="text_album">Album</string>
+    <string name="text_gallery">Galeri</string>
+    <string name="text_permission_needed">Izin Akses Dibutuhkan</string>
+    <string name="text_please_grant_access">Mohon beri akses</string>
+    <string name="text_for_accessing_your_camera">Untuk mengakses kameramu</string>
+    <string name="text_for_accessing_your_file">Untuk mengakses berkasmu</string>
+    <string name="text_for_accessing_your_album">Untuk mengakses albummu</string>
+    <string name="text_for_accessing_your_gallery">Untuk mengakses galerimu</string>
+
+    <string-array name="source_website_title">
+        <item>Komikcast</item>
+        <item>Westmanga</item>
+        <item>Ngomik</item>
+        <item>Shinigami</item>
+    </string-array>
+
+    <string-array name="source_website_url">
+<!--        <item>https://komikcast.site/</item>-->
+<!--        <item>https://komikcast.io/</item>-->
+        <item>https://komikcast.vip/</item>
+        <item>https://westmanga.info/</item>
+        <item>https://ngomik.net/</item>
+<!--        <item>https://shinigami.id/</item>-->
+<!--        <item>https://shinigami.ae/</item>-->
+        <item>https://shinigami.sh/</item>
+    </string-array>
+
+    <string-array name="source_website_image_not_found">
+<!--        <item>https://komikcast.vip/wp-content/uploads/2023/01/kcdefaultcover-2-e1674095844879.png</item>-->
+        <item>https://komikcast.vip/wp-content/uploads/2023/06/kclogo.png</item>
+        <item>https://westmanga.info/wp-content/uploads/2021/01/LOGOxx-1.png</item>
+        <item>https://i2.wp.com/ngomik.net/wp-content/uploads/2021/02/ngomik1.png</item>
+        <item>https://wuz.shinigami.id/wp-content/uploads/2022/03/20044501/11.png</item>
+    </string-array>
+
+</resources>
