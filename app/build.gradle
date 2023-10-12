@@ -57,6 +57,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.commit451:PhotoView:1.2.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -97,14 +98,10 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.11.0'
     implementation 'jp.wasabeef:glide-transformations:4.3.0'
-
-    implementation 'com.github.MikeOrtiz:TouchImageView:1.4.1'
     implementation 'com.karumi:dexter:6.2.1'
     implementation 'org.sufficientlysecure:html-textview:4.0'
 
     implementation 'org.jsoup:jsoup:1.15.4'
-
-    implementation 'com.github.Kelvao:CloudflareScrape:0.2.0'
 
     implementation 'io.realm:android-adapters:3.0.0'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'

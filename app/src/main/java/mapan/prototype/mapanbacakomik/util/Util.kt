@@ -28,7 +28,6 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import mapan.prototype.mapanbacakomik.R
-import mapan.prototype.mapanbacakomik.config.Constants
 import org.sufficientlysecure.htmltextview.HtmlFormatter
 import org.sufficientlysecure.htmltextview.HtmlFormatterBuilder
 import org.sufficientlysecure.htmltextview.HtmlHttpImageGetter

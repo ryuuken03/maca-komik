@@ -4,22 +4,19 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
-import android.widget.RelativeLayout
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.os.postDelayed
-import androidx.core.view.ViewCompat
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
-import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.BaseRequestOptions
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.SimpleTarget
@@ -30,8 +27,8 @@ import mapan.prototype.mapanbacakomik.config.Constants
 import mapan.prototype.mapanbacakomik.databinding.ActivityPreviewImageBinding
 import mapan.prototype.mapanbacakomik.util.BaseActivity
 import mapan.prototype.mapanbacakomik.util.GlideApp
-import mapan.prototype.mapanbacakomik.util.Log
 import mapan.prototype.mapanbacakomik.util.Util
+import uk.co.senab.photoview.PhotoViewAttacher
 
 
 class PreviewImageActivity : BaseActivity() {
@@ -135,19 +132,19 @@ class PreviewImageActivity : BaseActivity() {
                 }
 
                 override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?){
-                    binding.photo.updateLayoutParams<RelativeLayout.LayoutParams> {
+                    binding.photo.updateLayoutParams<LinearLayout.LayoutParams> {
                         if(resource.intrinsicHeight > heightD){
                             heightD = resource.intrinsicHeight
                         }else{
-                            var params = binding.layout.layoutParams
-                            params.height = heightD
-                            addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE)
+                            var params = binding.layout.layoutParams as FrameLayout.LayoutParams
+                            params.gravity = Gravity.CENTER
+                            binding.layout.layoutParams = params
                         }
-                        width = resource.intrinsicWidth
-                        height = heightD
                     }
                     binding.photo.setImageDrawable(resource)
                     binding.photo.visibility = View.VISIBLE
+                    var pAttacher = PhotoViewAttacher(binding.photo)
+                    pAttacher.update()
                 }
             })
 //            .into(binding.photo)
