@@ -25,7 +25,7 @@ class ListComicAsyncTask : AsyncTask<String, Void, ListComic>() {
         Log.d("OkCheck", url[0])
         var result = ListComic()
         var isEmpty = false
-//        try{
+        try{
 //            Log.d("OkParse","url[0]:"+url[0])
 //            Log.d("OkParse","url[1]:"+url[1])
             var doc : Document?= null
@@ -91,33 +91,32 @@ class ListComicAsyncTask : AsyncTask<String, Void, ListComic>() {
 
                 result = homePage
             }
-//        }catch (e:Exception){
-//            var homePage = ListComic()
-//            var listThumb = ArrayList<ComicThumbnail>()
-//            var genres = ArrayList<FilterComic>()
-//            var types = ArrayList<FilterComic>()
-//            var orderbys = ArrayList<FilterComic>()
-//            var page1 = "-1"
-//            var page2 = "-1"
-//            var page2Url = ""
-//            var page3 = "-1"
-////        var page3Url = ""
-//            var pageLast = "-1"
-//            homePage.page1 = page1
-//            homePage.page2 = page2
-//            homePage.page2Url = page2Url
-//            homePage.page3 = page3
-////        homePage.page3Url = page3Url
-//            homePage.pageLast = pageLast
-////        homePage.pageLastUrl = pageLastUrl
-//            homePage.list = listThumb
-//            homePage.genres = genres
-//            homePage.types = types
-//            homePage.orderbys = orderbys
-//            homePage.isSuccesed = false
-//
-//            result = homePage
-//        }
+        }catch (e:Exception){
+            var homePage = ListComic()
+            var listThumb = ArrayList<ComicThumbnail>()
+            var genres = ArrayList<FilterComic>()
+            var types = ArrayList<FilterComic>()
+            var orderbys = ArrayList<FilterComic>()
+            var page1 = "-1"
+            var page2 = "-1"
+            var page2Url = ""
+            var page3 = "-1"
+//        var page3Url = ""
+            var pageLast = "-1"
+            homePage.page1 = page1
+            homePage.page2 = page2
+            homePage.page2Url = page2Url
+            homePage.page3 = page3
+//        homePage.page3Url = page3Url
+            homePage.pageLast = pageLast
+//        homePage.pageLastUrl = pageLastUrl
+            homePage.list = listThumb
+            homePage.genres = genres
+            homePage.types = types
+            homePage.orderbys = orderbys
+
+            result = homePage
+        }
         return result
 
     }
@@ -135,7 +134,7 @@ class ListComicAsyncTask : AsyncTask<String, Void, ListComic>() {
                 var imgSrc = uta.getElementsByTag("img")[0].attr("src")
 //                Log.d("OkCheckUta", "uta:"+uta.toString())
 //                Log.d("OkCheck", "imgSrc:"+imgSrc)
-                if(imgSrc.equals("")){
+                if(imgSrc.equals("") || imgSrc.contains("data:image")){
 //                    Log.d("OkChecknoScript", "noScript:"+uta.getElementsByTag("noscript").toString())
                     var noScript = uta.getElementsByTag("noscript")
                     if(noScript.size > 0){

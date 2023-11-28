@@ -14,11 +14,17 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import mapan.prototype.mapanbacakomik.AsyncTask.ListComicAsyncTask
 import mapan.prototype.mapanbacakomik.R
 import mapan.prototype.mapanbacakomik.adapter.AdapterComicThumbnail
+import mapan.prototype.mapanbacakomik.api.APIHelper
+import mapan.prototype.mapanbacakomik.api.RetrofitClient
 import mapan.prototype.mapanbacakomik.databinding.ActivityListComicProjectBinding
 import mapan.prototype.mapanbacakomik.model.ComicThumbnail
 import mapan.prototype.mapanbacakomik.model.ListComic
+import mapan.prototype.mapanbacakomik.model.api.Comic
 import mapan.prototype.mapanbacakomik.util.BaseActivity
 import mapan.prototype.mapanbacakomik.util.Log
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.*
 
 
@@ -26,6 +32,9 @@ class ListComicProjectActivity : BaseActivity() {
     lateinit var binding: ActivityListComicProjectBinding
     lateinit var adapter: ItemAdapter<AdapterComicThumbnail>
     lateinit var fastAdapter: FastAdapter<AdapterComicThumbnail>
+
+    var callbackGetList: Call<ArrayList<Comic>>? = null
+    var service: APIHelper?= null
 
     var listPhotoGallery = ArrayList<AdapterComicThumbnail>()
     var sourceWeb = "https://komikcast.site/"
@@ -41,6 +50,13 @@ class ListComicProjectActivity : BaseActivity() {
         binding = ActivityListComicProjectBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(callbackGetList!=null){
+            callbackGetList?.cancel()
+        }
     }
 
     override fun onResume() {
@@ -95,6 +111,7 @@ class ListComicProjectActivity : BaseActivity() {
     }
 
     override fun initConfig() {
+        service = RetrofitClient.getClient(this)?.create(APIHelper::class.java)
         typeSource = intent.getIntExtra("typeSource",0)
         adapter = ItemAdapter()
         fastAdapter = FastAdapter.with(adapter)
@@ -120,15 +137,21 @@ class ListComicProjectActivity : BaseActivity() {
         binding.revListData.visibility = View.GONE
         binding.progress.visibility = View.VISIBLE
         var timer = 1000.toLong()
+        var isShow = true
         if(waitTime != null){
             timer = waitTime
+            if(waitTime == 0.toLong()){
+                isShow = false
+            }
         }
-        Handler().postDelayed(Runnable {
-            ShowData()
-        },timer)
+        if(isShow){
+            Handler().postDelayed(Runnable {
+                showData()
+            },timer)
+        }
     }
 
-    fun ShowData(){
+    fun showData(){
         binding.revListData.visibility = View.VISIBLE
         binding.progress.visibility = View.GONE
     }
@@ -232,10 +255,15 @@ class ListComicProjectActivity : BaseActivity() {
                 var intent = Intent(this@ListComicProjectActivity, ListChapterPageActivity::class.java)
                 intent.putExtra("selectUrl",item.urlLastChapter)
                 intent.putExtra("title","Chapter " + item.lastChapter)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("allChapterUrl",item.link)
+                intent.putExtra("thumbnail",item.src)
                 startActivity(intent)
             }else{
                 var intent = Intent(this@ListComicProjectActivity, DetailComicActivity::class.java)
                 intent.putExtra("selectUrl",item.link)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("imgSrc",item.src)
                 startActivity(intent)
             }
             false
@@ -251,48 +279,111 @@ class ListComicProjectActivity : BaseActivity() {
     }
 
     fun loadData(){
-        showProgress()
-        currentPage = 1
-        isMax = false
-        adapter.clear()
-        listPhotoGallery.clear()
-        var url = sourceWeb+getDefaultIndex()
-        if(selectUrl != null){
-            url = selectUrl!!
+        if(typeSource == 3){
+            loadShinigamiID(true)
         }else{
-            selectUrl = url
-        }
-        Log.d("OkCheck", "selectUrl:"+url)
-        var task = ListComicAsyncTask()
-        resultTask = task.execute(url,typeSource.toString())?.get()
-        for(i in  0 .. resultTask!!.list!!.size-1){
-            addDataAdapter(resultTask?.list!![i])
+            showProgress()
+            currentPage = 1
+            isMax = false
+            adapter.clear()
+            listPhotoGallery.clear()
+            var url = sourceWeb+getDefaultIndex()
+            if(selectUrl != null){
+                url = selectUrl!!
+            }else{
+                selectUrl = url
+            }
+            Log.d("OkCheck", "selectUrl:"+url)
+            var task = ListComicAsyncTask()
+            resultTask = task.execute(url,typeSource.toString())?.get()
+            for(i in  0 .. resultTask!!.list!!.size-1){
+                addDataAdapter(resultTask?.list!![i])
+            }
+
+            binding.revListData.scrollToPosition(0)
         }
 
-        binding.revListData.scrollToPosition(0)
+    }
+    fun loadShinigamiID(isReset : Boolean = false){
+        if(isReset){
+            showProgress(0)
+            currentPage = 1
+            isMax = false
+            adapter.clear()
+            listPhotoGallery.clear()
+        }else{
+            currentPage++
+        }
+        callbackGetList  = service?.loadComicListProject(currentPage)
+        callbackGetList!!.enqueue(object : Callback<ArrayList<Comic>> {
+            override fun onResponse(
+                call: Call<ArrayList<Comic>>,
+                response: Response<ArrayList<Comic>>
+            ) {
+                if (response.isSuccessful) {
+                    var tmp = response.body()!!
+                    for(i in  0 .. tmp.size-1){
+                        var data = tmp[i]
+                        var comic = ComicThumbnail()
+                        comic.id = i+1.toLong()
+                        comic.title = data.title
+                        comic.url = data.url
+                        comic.imgSrc = data.cover
+                        comic.lastChap = data.latestChapter
+                        comic.urlLastChap = data.latestChapterUrl
+                        addDataAdapter(comic)
+                    }
+                    if(isReset){
+                        showData()
+                        binding.revListData.scrollToPosition(0)
+                    }else{
+                        if(tmp.size == 0){
+                            isMax = true
+                        }
+                    }
+                } else {
+                    if(!isReset){
+                        isMax = true
+                    }else{
+                        showData()
+                    }
+                }
+            }
 
+            override fun onFailure(call: Call<ArrayList<Comic>>, t: Throwable) {
+                if(!isReset){
+                    isMax = true
+                }else{
+                    showData()
+                }
+            }
+        })
     }
 
     fun loadMore(){
-        var url = sourceWeb+getDefaultIndex()+"page/"+(currentPage+1)
-        var task = ListComicAsyncTask()
-        var resultTask2 = task.execute(url,typeSource.toString())?.get()
-        if(resultTask2!!.list!!.size > 0){
-            var firstItem = resultTask2!!.list!![0]
-            for(iAdapter in adapter.adapterItems){
-                if(firstItem.url!!.equals(iAdapter.link)){
-                    isMax = true
-                    break
-                }
-            }
-            if(!isMax){
-                for(i in  0 .. resultTask2!!.list!!.size-1){
-                    addDataAdapter(resultTask2?.list!![i])
-                }
-            }
-            currentPage++
+        if(typeSource == 3) {
+            loadShinigamiID()
         }else{
-            isMax = true
+            var url = sourceWeb+getDefaultIndex()+"page/"+(currentPage+1)
+            var task = ListComicAsyncTask()
+            var resultTask2 = task.execute(url,typeSource.toString())?.get()
+            if(resultTask2!!.list!!.size > 0){
+                var firstItem = resultTask2!!.list!![0]
+                for(iAdapter in adapter.adapterItems){
+                    if(firstItem.url!!.equals(iAdapter.link)){
+                        isMax = true
+                        break
+                    }
+                }
+                if(!isMax){
+                    for(i in  0 .. resultTask2!!.list!!.size-1){
+                        addDataAdapter(resultTask2?.list!![i])
+                    }
+                }
+                currentPage++
+            }else{
+                isMax = true
+            }
         }
     }
 

@@ -51,7 +51,7 @@ class ComicDetailAsyncTask : AsyncTask<String, Void, DetailComic>() {
             if(img.size>0){
                 imgThumb = img[0].attr("src")
             }
-            if(imgThumb.equals("")){
+            if(imgThumb.equals("") || imgThumb.contains("data:image")){
                 var metas = thumbnails[0].getElementsByTag("meta")
                 for(meta in metas){
                     if(meta.attr("itemprop").equals("url")){

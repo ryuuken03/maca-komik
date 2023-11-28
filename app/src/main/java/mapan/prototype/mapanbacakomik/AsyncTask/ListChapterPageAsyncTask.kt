@@ -44,13 +44,13 @@ class ListChapterPageAsyncTask : AsyncTask<String, Void, ChapterPageComic>() {
         var listImage = readingArea[0].getElementsByTag("img")
         var i = 1
         for(image in listImage){
-            var src = image.attr("src")
-//            Log.d("OkCheck",src)
+            var src = image.attr("data-src")
+            if(src.equals("")){
+                src = image.attr("src")
+            }
             if(!src.equals("")){
                 var w = image.attr("width")
                 var h = image.attr("height")
-//                Log.d("OkCheck", i.toString()+":"+src)
-
                 var com = ComicChapterPage()
                 com.id = i.toLong()
                 com.w = w

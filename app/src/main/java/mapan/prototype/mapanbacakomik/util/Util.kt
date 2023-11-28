@@ -222,7 +222,6 @@ class Util {
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
 
-
         fun loadHtmlView(string: String, textView: TextView): CharSequence? {
             return HtmlFormatter.formatHtml(
                 HtmlFormatterBuilder().setHtml(string).setImageGetter(HtmlHttpImageGetter(textView))

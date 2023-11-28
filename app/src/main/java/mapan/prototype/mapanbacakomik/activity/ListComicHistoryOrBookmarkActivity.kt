@@ -195,12 +195,17 @@ class ListComicHistoryOrBookmarkActivity : BaseActivity() {
             if(item.lastChapter.equals("Chapter All",true)){
                 var intent = Intent(this@ListComicHistoryOrBookmarkActivity, DetailComicActivity::class.java)
                 intent.putExtra("selectUrl",item.urlDetailComic)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("imgSrc",item.imgSrc)
                 startActivity(intent)
             }else{
                 var intent = Intent(this@ListComicHistoryOrBookmarkActivity, ListChapterPageActivity::class.java)
                 intent.putExtra("selectUrl",item.urlLastChapter)
                 intent.putExtra("title",item.lastChapter)
                 intent.putExtra("position",item.pageChapter)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("allChapterUrl",item.urlDetailComic)
+                intent.putExtra("thumbnail",item.imgSrc)
                 startActivity(intent)
             }
             false

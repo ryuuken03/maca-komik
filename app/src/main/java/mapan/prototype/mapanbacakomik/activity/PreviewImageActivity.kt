@@ -119,7 +119,6 @@ class PreviewImageActivity : BaseActivity() {
             .into(object : CustomTarget<Drawable>(widthD, 1) {
                 override fun onLoadFailed(errorDrawable: Drawable?
                 ){
-
                     var weakHandler = Handler()
                     weakHandler.postDelayed(Runnable {
                         if(!isDestroyed){
@@ -136,7 +135,7 @@ class PreviewImageActivity : BaseActivity() {
                         if(resource.intrinsicHeight > heightD){
                             heightD = resource.intrinsicHeight
                         }else{
-                            var params = binding.layout.layoutParams as FrameLayout.LayoutParams
+                            var params = binding.layout.layoutParams as FrameLayout.LayoutParams    
                             params.gravity = Gravity.CENTER
                             binding.layout.layoutParams = params
                         }

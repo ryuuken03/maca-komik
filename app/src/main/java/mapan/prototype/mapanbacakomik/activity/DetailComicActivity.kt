@@ -17,11 +17,17 @@ import mapan.prototype.mapanbacakomik.AsyncTask.ComicDetailAsyncTask
 import mapan.prototype.mapanbacakomik.R
 import mapan.prototype.mapanbacakomik.util.BaseActivity
 import mapan.prototype.mapanbacakomik.adapter.AdapterChapterName
+import mapan.prototype.mapanbacakomik.api.APIHelper
+import mapan.prototype.mapanbacakomik.api.RetrofitClient
 import mapan.prototype.mapanbacakomik.databinding.ActivityDetailComicBinding
 import mapan.prototype.mapanbacakomik.model.ComicChapter
+import mapan.prototype.mapanbacakomik.model.api.DetailComic
 import mapan.prototype.mapanbacakomik.model.realm.ComicSave
 import mapan.prototype.mapanbacakomik.util.Log
 import mapan.prototype.mapanbacakomik.util.Util
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.*
 
 
@@ -30,8 +36,12 @@ class DetailComicActivity : BaseActivity() {
     lateinit var adapter: ItemAdapter<AdapterChapterName>
     lateinit var fastAdapter: FastAdapter<AdapterChapterName>
 
+    var callbackGetDetail: Call<DetailComic>? = null
+    var service: APIHelper?= null
+
     var listChapter = ArrayList<AdapterChapterName>()
     var selectUrl: String? = null
+    var titleComic: String? = null
     var imgSrc: String? = null
     var isFirst = true
     var realm: Realm? = null
@@ -40,6 +50,13 @@ class DetailComicActivity : BaseActivity() {
         binding = ActivityDetailComicBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(callbackGetDetail!=null){
+            callbackGetDetail?.cancel()
+        }
     }
 
     override fun onResume() {
@@ -52,6 +69,7 @@ class DetailComicActivity : BaseActivity() {
     }
 
     override fun initConfig() {
+        service = RetrofitClient.getClient(this)?.create(APIHelper::class.java)
         realm = Realm.getDefaultInstance()
         adapter = ItemAdapter()
         fastAdapter = FastAdapter.with(adapter)
@@ -64,6 +82,8 @@ class DetailComicActivity : BaseActivity() {
             isFirst = false
         }
         selectUrl = intent.getStringExtra("selectUrl")
+        imgSrc = intent.getStringExtra("imgSrc")
+        titleComic = intent.getStringExtra("titleComic")
 
         binding.toolbar.title.text = "Daftar Chapter"
         binding.toolbar.btnAddBookmark.visibility = View.VISIBLE
@@ -86,14 +106,20 @@ class DetailComicActivity : BaseActivity() {
         binding.revListData.visibility = View.GONE
         binding.progress.visibility = View.VISIBLE
         var timer = 1000.toLong()
+        var isShow = true
         if(waitTime != null){
             timer = waitTime
+            if(waitTime == 0.toLong()){
+                isShow = false
+            }
         }
-        Handler().postDelayed(Runnable {
-            showShowData()
-        },timer)
+        if(isShow){
+            Handler().postDelayed(Runnable {
+                showData()
+            },timer)
+        }
     }
-    fun showShowData(){
+    fun showData(){
         binding.layoutData.visibility = View.VISIBLE
         binding.revListData.visibility = View.VISIBLE
         binding.progress.visibility = View.GONE
@@ -192,6 +218,9 @@ class DetailComicActivity : BaseActivity() {
             intent.putExtra("selectUrl",item.url)
             intent.putExtra("title",item.name)
             intent.putExtra("isOpenDetailComic",true)
+            intent.putExtra("titleComic",binding.titlePage.text.toString())
+            intent.putExtra("allChapterUrl",selectUrl)
+            intent.putExtra("thumbnail",imgSrc)
             startActivity(intent)
             false
         }
@@ -221,12 +250,84 @@ class DetailComicActivity : BaseActivity() {
         }
     }
 
-    fun loadData(){
-        showProgress()
+    fun loadDetailComicShinigami(){
+        showProgress(0)
         adapter.clear()
         listChapter.clear()
+        callbackGetDetail  = service?.loadComicDetail(selectUrl!!)
+        callbackGetDetail!!.enqueue(object : Callback<DetailComic> {
+            override fun onResponse(
+                call: Call<DetailComic>,
+                response: Response<DetailComic>
+            ) {
+                if (response.isSuccessful) {
+                    var tmp = response.body()!!
+                    for(i in  0 .. tmp.chapterList!!.size-1){
+                        var data = tmp.chapterList!![i]
+                        var ch = ComicChapter()
+                        ch.id = i+1.toLong()
+                        var titles = data.title!!.split(" - ")
+                        ch.name = titles[0]
+                        ch.time = data.releaseDate
+                        ch.url = data.url!!
+                        addDataAdapter(ch)
+                    }
+                    binding.titlePage.text = Util.convertStringISOtoUTF8(titleComic!!)
+                    var genre = ""
+                    var typeComic = ""
+                    var author = ""
+                    for(data in tmp?.detailList!!){
+                        if(data.name!!.contains("Genre",true)){
+                            genre = data.value!!
+                        }
+                        if(data.name!!.contains("Type",true)){
+                            typeComic = "Type: "+data.value!!
+                        }
+                        if(data.name!!.contains("Author",true)){
+                            author = "Author: "+data.value!!
+                        }
+                    }
+                    binding.genre.text = Util.loadHtmlView(genre,binding.genre)
+                    binding.type.text = Util.loadHtmlView(typeComic,binding.type)
+                    binding.release.text = Util.loadHtmlView(author,binding.release)
 
-        var task = ComicDetailAsyncTask()
+                    var width = Util.getDisplay(this@DetailComicActivity)!!.widthPixels-Util.convertDpToPx(6,this@DetailComicActivity)
+                    var wResult : Double = width.toDouble()/3.0
+                    var hResult : Double = width.toDouble()/2.0
+
+                    var param = binding.photo.layoutParams as RelativeLayout.LayoutParams
+                    param.width = wResult.toInt()
+                    param.height = hResult.toInt()
+                    var scaleType = ImageView.ScaleType.CENTER
+                    var isImageEmpty = false
+                    if(imgSrc == null){
+                        isImageEmpty = true
+                    }else{
+                        if(imgSrc.equals("")){
+                            isImageEmpty = true
+                        }
+                    }
+                    if(isImageEmpty){
+                        scaleType = ImageView.ScaleType.CENTER_INSIDE
+                        var imageNotFound = resources.getStringArray(R.array.source_website_image_not_found)
+                        imgSrc = imageNotFound[3]
+                    }
+                    binding.photo.setScaleType(scaleType)
+                    Util.loadImageSetWH(this@DetailComicActivity, imgSrc!!, binding.photo,"",wResult.toInt(),hResult.toInt())
+                    showData()
+                    showBookmark()
+                } else {
+
+                }
+            }
+
+            override fun onFailure(call: Call<DetailComic>, t: Throwable) {
+
+            }
+        })
+    }
+
+    fun loadData(){
         var type = "0"
         var sourceUrls = resources.getStringArray(R.array.source_website_url)
         var index = 0
@@ -237,40 +338,49 @@ class DetailComicActivity : BaseActivity() {
             }
             index++
         }
-        var resultTask = task.execute(selectUrl,type)?.get()
-        for(i in  0 .. resultTask!!.list!!.size-1){
-            addDataAdapter(resultTask.list!![i])
-        }
-        binding.titlePage.text = Util.convertStringISOtoUTF8(resultTask.title!!)
-        binding.genre.text = Util.loadHtmlView(resultTask.genre!!,binding.genre)
-        binding.type.text = Util.loadHtmlView(resultTask.type!!,binding.type)
-        binding.release.text = Util.loadHtmlView(resultTask.release!!,binding.release)
-
-        var width = Util.getDisplay(this)!!.widthPixels-Util.convertDpToPx(6,this)
-        var wResult : Double = width.toDouble()/3.0
-        var hResult : Double = width.toDouble()/2.0
-
-        var param = binding.photo.layoutParams as RelativeLayout.LayoutParams
-        param.width = wResult.toInt()
-        param.height = hResult.toInt()
-        imgSrc = resultTask.imgSrc
-        var scaleType = ImageView.ScaleType.CENTER
-        var isImageEmpty = false
-        if(imgSrc == null){
-            isImageEmpty = true
+        if(type.equals("3")){
+            loadDetailComicShinigami()
         }else{
-            if(imgSrc.equals("")){
-                isImageEmpty = true
+            showProgress()
+            adapter.clear()
+            listChapter.clear()
+
+            var task = ComicDetailAsyncTask()
+            var resultTask = task.execute(selectUrl,type)?.get()
+            for(i in  0 .. resultTask!!.list!!.size-1){
+                addDataAdapter(resultTask.list!![i])
             }
+            binding.titlePage.text = Util.convertStringISOtoUTF8(resultTask.title!!)
+            binding.genre.text = Util.loadHtmlView(resultTask.genre!!,binding.genre)
+            binding.type.text = Util.loadHtmlView(resultTask.type!!,binding.type)
+            binding.release.text = Util.loadHtmlView(resultTask.release!!,binding.release)
+
+            var width = Util.getDisplay(this)!!.widthPixels-Util.convertDpToPx(6,this)
+            var wResult : Double = width.toDouble()/3.0
+            var hResult : Double = width.toDouble()/2.0
+
+            var param = binding.photo.layoutParams as RelativeLayout.LayoutParams
+            param.width = wResult.toInt()
+            param.height = hResult.toInt()
+            imgSrc = resultTask.imgSrc
+            var scaleType = ImageView.ScaleType.CENTER
+            var isImageEmpty = false
+            if(imgSrc == null){
+                isImageEmpty = true
+            }else{
+                if(imgSrc.equals("")){
+                    isImageEmpty = true
+                }
+            }
+            if(isImageEmpty){
+                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                var imageNotFound = resources.getStringArray(R.array.source_website_image_not_found)
+                imgSrc = imageNotFound[type.toInt()]
+            }
+            binding.photo.setScaleType(scaleType)
+            Util.loadImageSetWH(this, imgSrc!!, binding.photo,"",wResult.toInt(),hResult.toInt())
+            showBookmark()
         }
-        if(isImageEmpty){
-            scaleType = ImageView.ScaleType.CENTER_INSIDE
-            var imageNotFound = resources.getStringArray(R.array.source_website_image_not_found)
-            imgSrc = imageNotFound[type.toInt()]
-        }
-        binding.photo.setScaleType(scaleType)
-        Util.loadImageSetWH(this, imgSrc!!, binding.photo,"",wResult.toInt(),hResult.toInt())
-        showBookmark()
     }
 
     fun addDataAdapter(chapter: ComicChapter){

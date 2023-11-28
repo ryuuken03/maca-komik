@@ -30,13 +30,11 @@ class RetrofitClient {
         var retry = 0
         var request_count = 0
 
-//        var basUrlShinigamiId = "https://shinigami.id/wp-admin/"
-//        var basUrlShinigamiId = "https://shinigami.ae/wp-admin/"
+        var basUrlShinigamiId = "http://154.26.133.63:8080/api/"
 
         fun getClient(context: Context?): Retrofit? {
-            var sourceUrls = context?.resources?.getStringArray(R.array.source_website_url)
-//            var basUrlShinigamiId = "https://shinigami.sh/wp-admin/"
-            var basUrlShinigamiId = sourceUrls!![3]+"wp-admin/"
+//            var sourceUrls = context?.resources?.getStringArray(R.array.source_website_url)
+//            var basUrlShinigamiId = sourceUrls!![3]+"wp-admin/"
             if (Log.LOG) {
                 val logging = HttpLoggingInterceptor()
                 logging.level = HttpLoggingInterceptor.Level.BODY
@@ -45,10 +43,7 @@ class RetrofitClient {
             // set Accept-Language header
             httpClient.addInterceptor(Interceptor { chain ->
                 try {
-//                    retry++
                     request_count++
-//                    Log.e("RequestEk", " => count : " + request_count + " " + chain.request().url)
-
                     val request =
                         chain.request().newBuilder().addHeader("Accept-Language", "id-ID")
                             .build()
@@ -56,17 +51,6 @@ class RetrofitClient {
                     return@Interceptor chain.proceed(request)
 
                 } catch (sto: SocketTimeoutException) {
-//                    if(listener != null){
-//                        listener!!.onConnectionTimeout()
-//                    }else{
-//
-//                    }
-//                    return@Interceptor chain.proceed(chain.request())
-//                    throw SocketTimeoutException()
-//                    Log.e(
-//                        "TimeoutEk",
-//                        " => count : " + retry + " " + sto.message.toString() + " " + chain.request().url
-//                    )
                     if (retry == 3) {
                         retry = 0
                         throw SocketTimeoutException()
@@ -84,9 +68,6 @@ class RetrofitClient {
 
             if (clientRetrofit == null) {
                 if (context != null) {
-//                    var printListener = PrintingEventListener()
-//                    httpClient.eventListener(printListener)
-
                     if (Log.LOG) {
                         val loggingListener = LoggingEventListener.Factory()
                         httpClient.eventListenerFactory(loggingListener)

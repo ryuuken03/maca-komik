@@ -30,8 +30,9 @@
     <string-array name="source_website_url">
 <!--        <item>https://komikcast.site/</item>-->
 <!--        <item>https://komikcast.io/</item>-->
-        <item>https://komikcast.vip/</item>
-        <item>https://westmanga.info/</item>
+<!--        <item>https://komikcast.vip/</item>-->
+        <item>https://komikcast.ch/</item>
+        <item>https://westmanga.org/</item>
         <item>https://ngomik.net/</item>
 <!--        <item>https://shinigami.id/</item>-->
 <!--        <item>https://shinigami.ae/</item>-->
@@ -40,8 +41,9 @@
 
     <string-array name="source_website_image_not_found">
 <!--        <item>https://komikcast.vip/wp-content/uploads/2023/01/kcdefaultcover-2-e1674095844879.png</item>-->
-        <item>https://komikcast.vip/wp-content/uploads/2023/06/kclogo.png</item>
-        <item>https://westmanga.info/wp-content/uploads/2021/01/LOGOxx-1.png</item>
+<!--        <item>https://komikcast.vip/wp-content/uploads/2023/06/kclogo.png</item>-->
+        <item>https://komikcast.ch/wp-content/uploads/2023/06/kclogo.png</item>
+        <item>https://westmanga.org/wp-content/uploads/2021/01/LOGOxx-1.png</item>
         <item>https://i2.wp.com/ngomik.net/wp-content/uploads/2021/02/ngomik1.png</item>
         <item>https://wuz.shinigami.id/wp-content/uploads/2022/03/20044501/11.png</item>
     </string-array>

@@ -17,14 +17,25 @@ import mapan.prototype.mapanbacakomik.AsyncTask.ListChapterPageAsyncTask
 import mapan.prototype.mapanbacakomik.BuildConfig
 import mapan.prototype.mapanbacakomik.R
 import mapan.prototype.mapanbacakomik.adapter.AdapterChapterPage
+import mapan.prototype.mapanbacakomik.api.APIHelper
+import mapan.prototype.mapanbacakomik.api.RetrofitClient
 import mapan.prototype.mapanbacakomik.config.Constants
 import mapan.prototype.mapanbacakomik.databinding.ActivityListChapterPageBinding
 import mapan.prototype.mapanbacakomik.model.ComicChapterPage
+import mapan.prototype.mapanbacakomik.model.ComicThumbnail
+import mapan.prototype.mapanbacakomik.model.api.Browse
+import mapan.prototype.mapanbacakomik.model.api.ChapterComic
+import mapan.prototype.mapanbacakomik.model.api.Comic
+import mapan.prototype.mapanbacakomik.model.api.DetailComic
+import mapan.prototype.mapanbacakomik.model.api.ImageList
 import mapan.prototype.mapanbacakomik.model.realm.ComicHistory
 import mapan.prototype.mapanbacakomik.model.realm.ComicSave
 import mapan.prototype.mapanbacakomik.util.BaseActivity
 import mapan.prototype.mapanbacakomik.util.Log
 import mapan.prototype.mapanbacakomik.util.Util
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class ListChapterPageActivity : BaseActivity() {
@@ -35,6 +46,8 @@ class ListChapterPageActivity : BaseActivity() {
     var listPageChapter = ArrayList<AdapterChapterPage>()
     var listOnFinishLoad = ArrayList<String>()
     var selectUrl: String? = null
+    var titleComic: String? = null
+    var thumbnail: String? = null
     var prevUrl: String? = null
     var allChapterUrl: String? = null
     var nextUrl: String? = null
@@ -42,12 +55,17 @@ class ListChapterPageActivity : BaseActivity() {
     var isOpenDetailComic = false
     var realm: Realm? = null
 
+    var callbackGetChapter: Call<ImageList>? = null
+    var callbackGetDetail: Call<DetailComic>? = null
+    var service: APIHelper?= null
+
     var firstPos = 0
     var position = 0
     var savePosition = 0
     var maxPage = 1
     var loadPage = 0
     var perLoadPage = 3
+    var detailComicShinigami : DetailComic?= null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityListChapterPageBinding.inflate(layoutInflater)
@@ -64,7 +82,18 @@ class ListChapterPageActivity : BaseActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if(callbackGetChapter!=null){
+            callbackGetChapter?.cancel()
+        }
+        if(callbackGetDetail!=null){
+            callbackGetDetail?.cancel()
+        }
+    }
+
     override fun initConfig() {
+        service = RetrofitClient.getClient(this)?.create(APIHelper::class.java)
         realm = Realm.getDefaultInstance()
         adapter = ItemAdapter()
         fastAdapter = FastAdapter.with(adapter)
@@ -84,6 +113,9 @@ class ListChapterPageActivity : BaseActivity() {
 //            position = intent.getIntExtra("position",0)
 //        }
         var title = intent.getStringExtra("title")
+        titleComic = intent.getStringExtra("titleComic")
+        allChapterUrl = intent.getStringExtra("allChapterUrl")
+        thumbnail = intent.getStringExtra("thumbnail")
         binding.toolbar.title.text = title
         binding.toolbar.btnAddBookmark.visibility = View.VISIBLE
         binding.revListData.layoutManager = LinearLayoutManager(this)
@@ -249,6 +281,8 @@ class ListChapterPageActivity : BaseActivity() {
                 var intent = Intent(this@ListChapterPageActivity, DetailComicActivity::class.java)
                 intent.putExtra("selectUrl",allChapterUrl)
                 intent.putExtra("title",binding.titlePage.text.toString())
+                intent.putExtra("titleComic",titleComic)
+                intent.putExtra("imgSrc",thumbnail)
                 startActivity(intent)
                 finish()
             }
@@ -276,23 +310,9 @@ class ListChapterPageActivity : BaseActivity() {
             if(loadPage > 0 ){
                 isShowData = true
             }
-//            if(listPageChapter.size < perLoadPage){
-//                isShowData = true
-////                showData()
-//            }else{
-//                if(loadPage >= perLoadPage){
-//                    isShowData = true
-//                    showData()
-//                }
-//            }
             if(isShowData){
                 showData()
             }
-//            checkAddAdapter()
-//            if(loadPage == maxPage){
-//                Log.d("OkCheck","finish Load All Data")
-//                fastAdapter.notifyDataSetChanged()
-//            }
         }
     }
 
@@ -348,6 +368,11 @@ class ListChapterPageActivity : BaseActivity() {
         var genreComic = "-"
         var typeComic = "-"
         var thumbComic = listPageChapter[0].src
+        if(thumbnail!=null){
+            if(!Util.isTextEmpty(thumbnail)){
+                thumbComic = thumbnail
+            }
+        }
         for(source in sourceUrls){
             if(allChapterUrl!!.contains(source,true)){
                 type = index.toString()
@@ -358,19 +383,30 @@ class ListChapterPageActivity : BaseActivity() {
         if(allChapterUrl!!.equals(selectUrl)){
 
         }else{
-            var task = ComicDetailAsyncTask()
-            var resultTask = task.execute(allChapterUrl,type)?.get()
-            if(resultTask?.title!=null){
-                titleComic = resultTask?.title!!
-            }
-            if(resultTask?.genre!=null){
-                genreComic = resultTask.genre!!
-            }
-            if(resultTask?.type!=null){
-                typeComic = resultTask.type!!
-            }
-            if(resultTask?.imgSrc!=null){
-                thumbComic = resultTask.imgSrc!!
+            if(type.equals("3")){
+                for(data in detailComicShinigami?.detailList!!){
+                    if(data.name!!.contains("Genre",true)){
+                        genreComic = data.value!!
+                    }
+                    if(data.name!!.contains("Type",true)){
+                        typeComic = "Type: "+data.value!!
+                    }
+                }
+            }else{
+                var task = ComicDetailAsyncTask()
+                var resultTask = task.execute(allChapterUrl,type)?.get()
+                if(resultTask?.title!=null){
+                    titleComic = resultTask?.title!!
+                }
+                if(resultTask?.genre!=null){
+                    genreComic = resultTask.genre!!
+                }
+                if(resultTask?.type!=null){
+                    typeComic = resultTask.type!!
+                }
+                if(resultTask?.imgSrc!=null){
+                    thumbComic = resultTask.imgSrc!!
+                }
             }
         }
         val history = realm!!.where(ComicHistory::class.java).findAll()
@@ -408,6 +444,27 @@ class ListChapterPageActivity : BaseActivity() {
         realm!!.commitTransaction()
     }
 
+    fun loadDetailComicShinigami(){
+        callbackGetDetail  = service?.loadComicDetail(allChapterUrl!!)
+        callbackGetDetail!!.enqueue(object : Callback<DetailComic> {
+            override fun onResponse(
+                call: Call<DetailComic>,
+                response: Response<DetailComic>
+            ) {
+                if (response.isSuccessful) {
+                    detailComicShinigami = response.body()
+                    loadShinigamiID()
+                } else {
+
+                }
+            }
+
+            override fun onFailure(call: Call<DetailComic>, t: Throwable) {
+
+            }
+        })
+    }
+
     fun parsingDetailComic(urlDetail:String){
         showProgress()
         var type = "0"
@@ -417,6 +474,11 @@ class ListChapterPageActivity : BaseActivity() {
         var genreComic = "-"
         var typeComic = "-"
         var thumbComic = listPageChapter[0].src
+        if(thumbnail!=null){
+            if(!Util.isTextEmpty(thumbnail)){
+                thumbComic = thumbnail
+            }
+        }
         for(source in sourceUrls){
             if(urlDetail.contains(source,true)){
                 type = index.toString()
@@ -427,19 +489,30 @@ class ListChapterPageActivity : BaseActivity() {
         if(urlDetail.equals(selectUrl)){
 
         }else{
-            var task = ComicDetailAsyncTask()
-            var resultTask = task.execute(urlDetail,type)?.get()
-            if(resultTask?.title!=null){
-                titleComic = resultTask?.title!!
-            }
-            if(resultTask?.genre!=null){
-                genreComic = resultTask.genre!!
-            }
-            if(resultTask?.type!=null){
-                typeComic = resultTask.type!!
-            }
-            if(resultTask?.imgSrc!=null){
-                thumbComic = resultTask.imgSrc!!
+            if(type.equals("3")){
+                for(data in detailComicShinigami?.detailList!!){
+                    if(data.name!!.contains("Genre",true)){
+                        genreComic = data.value!!
+                    }
+                    if(data.name!!.contains("Type",true)){
+                        typeComic = "Type: "+data.value!!
+                    }
+                }
+            }else{
+                var task = ComicDetailAsyncTask()
+                var resultTask = task.execute(urlDetail,type)?.get()
+                if(resultTask?.title!=null){
+                    titleComic = resultTask?.title!!
+                }
+                if(resultTask?.genre!=null){
+                    genreComic = resultTask.genre!!
+                }
+                if(resultTask?.type!=null){
+                    typeComic = resultTask.type!!
+                }
+                if(resultTask?.imgSrc!=null){
+                    thumbComic = resultTask.imgSrc!!
+                }
             }
         }
         val listComic = realm!!.where(ComicSave::class.java).findAll()
@@ -447,7 +520,6 @@ class ListChapterPageActivity : BaseActivity() {
         var idDelete = 1
         var isDelete = false
         if(listComic!=null){
-//            Log.d("OkCheck","size:"+listComic.size.toString())
             if(listComic.size > 0){
                 for(comic in listComic){
                     if(comic.urlDetail!!.equals(urlDetail)){
@@ -456,14 +528,9 @@ class ListChapterPageActivity : BaseActivity() {
                         break
                     }
                 }
-//                if(!isDelete){
-                    id = listComic.get(listComic.size-1)!!.id!!.toInt()+1
-//                }else{
-//                    Log.d("OkCheck","url:"+url)
-//                }
+                id = listComic.get(listComic.size-1)!!.id!!.toInt()+1
             }
         }
-//        Log.d("OkCheck","id:"+id.toString())
         var save = ComicSave()
         save.id = id.toLong()
         save.title = titleComic
@@ -497,7 +564,6 @@ class ListChapterPageActivity : BaseActivity() {
         }else{
             Toast.makeText(this@ListChapterPageActivity,"Komik telah disimpan pada halaman "+(position+1).toString(),Toast.LENGTH_SHORT).show()
         }
-//        showShowData()
     }
 
     fun showBookmark(){
@@ -522,13 +588,6 @@ class ListChapterPageActivity : BaseActivity() {
     }
 
     fun loadData(){
-        showProgress(0)
-        loadPage = 0
-        listOnFinishLoad.clear()
-        adapter.clear()
-        listPageChapter.clear()
-        prevUrl = null
-        nextUrl = null
         var type = "0"
         var sourceUrls = resources.getStringArray(R.array.source_website_url)
         var index = 0
@@ -539,53 +598,141 @@ class ListChapterPageActivity : BaseActivity() {
             }
             index++
         }
+        if(type.equals("3")){
+            loadDetailComicShinigami()
+        }else{
+            showProgress(0)
+            loadPage = 0
+            listOnFinishLoad.clear()
+            adapter.clear()
+            listPageChapter.clear()
+            prevUrl = null
+            nextUrl = null
 
-        var task = ListChapterPageAsyncTask()
-        var resultTask = task.execute(selectUrl,type)?.get()
-        for(i in  0 .. resultTask!!.list!!.size-1){
-            addToList(resultTask.list!![i])
+            var task = ListChapterPageAsyncTask()
+            var resultTask = task.execute(selectUrl,type)?.get()
+            for(i in  0 .. resultTask!!.list!!.size-1){
+                addToList(resultTask.list!![i])
 //            if(i < perLoadPage){
                 addToAdapter(listPageChapter[i])
 //            }
-        }
-        maxPage = resultTask.list!!.size
-        if(maxPage  > 1){
-            binding.toolbar.chapterPage.visibility = View.VISIBLE
-        }
-        binding.toolbar.chapterPage.text = (position+1).toString()+" / "+maxPage
-        if(resultTask.currentChap!=null){
-            if(resultTask.currentChap!!.contains("Indonesia",true)){
-                resultTask.currentChap = resultTask.currentChap!!.replace("Bahasa Indonesia","",true)
             }
-        }
-        binding.toolbar.title.text = "Chapter "+resultTask.currentChap
+            maxPage = resultTask.list!!.size
+            if(maxPage  > 1){
+                binding.toolbar.chapterPage.visibility = View.VISIBLE
+            }
+            binding.toolbar.chapterPage.text = (position+1).toString()+" / "+maxPage
+            if(resultTask.currentChap!=null){
+                if(resultTask.currentChap!!.contains("Indonesia",true)){
+                    resultTask.currentChap = resultTask.currentChap!!.replace("Bahasa Indonesia","",true)
+                }
+            }
+            binding.toolbar.title.text = "Chapter "+resultTask.currentChap
 
 //        binding.titlePage.text = resultTask.title
-        binding.titlePage.text = Util.convertStringISOtoUTF8(resultTask.title!!)
-        binding.pagePrev.visibility = View.INVISIBLE
-        binding.pageAll.visibility = View.INVISIBLE
-        binding.pageNext.visibility = View.INVISIBLE
-        if(resultTask.pagePrev!=null){
-            if(!Util.isTextEmpty(resultTask.pagePrev)){
-                prevUrl = resultTask.pagePrev
-                binding.pagePrev.visibility = View.VISIBLE
+            binding.titlePage.text = Util.convertStringISOtoUTF8(resultTask.title!!)
+            binding.pagePrev.visibility = View.INVISIBLE
+            binding.pageAll.visibility = View.INVISIBLE
+            binding.pageNext.visibility = View.INVISIBLE
+            if(resultTask.pagePrev!=null){
+                if(!Util.isTextEmpty(resultTask.pagePrev)){
+                    prevUrl = resultTask.pagePrev
+                    binding.pagePrev.visibility = View.VISIBLE
+                }
+            }
+            if(resultTask.pageAll!=null){
+                if(!Util.isTextEmpty(resultTask.pageAll)){
+                    allChapterUrl = resultTask.pageAll
+                    binding.pageAll.visibility = View.VISIBLE
+                    showBookmark()
+                }
+            }
+            if(resultTask.pageNext!=null){
+                if(!Util.isTextEmpty(resultTask.pageNext)){
+                    nextUrl = resultTask.pageNext
+                    binding.pageNext.visibility = View.VISIBLE
+                }
+            }
+            if(listPageChapter.size > 0){
+                saveHistory()
             }
         }
-        if(resultTask.pageAll!=null){
-            if(!Util.isTextEmpty(resultTask.pageAll)){
-                allChapterUrl = resultTask.pageAll
-                binding.pageAll.visibility = View.VISIBLE
-                showBookmark()
-            }
-        }
-        if(resultTask.pageNext!=null){
-            if(!Util.isTextEmpty(resultTask.pageNext)){
-                nextUrl = resultTask.pageNext
-                binding.pageNext.visibility = View.VISIBLE
-            }
-        }
-        saveHistory()
+    }
+    fun loadShinigamiID(){
+        showProgress(0)
+        loadPage = 0
+        listOnFinishLoad.clear()
+        adapter.clear()
+        listPageChapter.clear()
+        prevUrl = null
+        nextUrl = null
+        callbackGetChapter  = service?.loadComicChapter(selectUrl!!,0)
+        callbackGetChapter!!.enqueue(object : Callback<ImageList> {
+            override fun onResponse(
+                call: Call<ImageList>,
+                response: Response<ImageList>
+            ) {
+                if (response.isSuccessful) {
+                    var tmp = response.body()!!
+                    for(i in  0 .. tmp.imageList!!.size-1){
+                        var chapter = ComicChapterPage()
+                        chapter.id = i+1.toLong()
+                        chapter.w = ""
+                        chapter.h = ""
+                        chapter.imgSrc = tmp.imageList!![i]
+                        addToList(chapter)
+                        addToAdapter(listPageChapter[i])
+//            }
+                    }
+                    maxPage = tmp.imageList!!.size
+                    if(maxPage  > 1){
+                        binding.toolbar.chapterPage.visibility = View.VISIBLE
+                    }
+                    binding.toolbar.chapterPage.text = (position+1).toString()+" / "+maxPage
+                    var chapter = "Chapter "
+                    var chapters = detailComicShinigami?.chapterList!!
+                    binding.pagePrev.visibility = View.INVISIBLE
+                    binding.pageAll.visibility = View.INVISIBLE
+                    binding.pageNext.visibility = View.INVISIBLE
+                    for(i in 0 ..  chapters.size-1){
+                        if(chapters[i].url.equals(selectUrl!!)){
+                            chapter = chapters[i].title!!
+                            var prev = ""
+                            var next = ""
+                            if(i == 0){
+                                prev = chapters[i+1].url!!
+                            }else if(i > 0 && i < chapters.size-1){
+                                prev = chapters[i+1].url!!
+                                next = chapters[i-1].url!!
+                            }else{
+                                next = chapters[i-1].url!!
+                            }
 
+                            if(!Util.isTextEmpty(prev)){
+                                prevUrl = prev
+                                binding.pagePrev.visibility = View.VISIBLE
+                            }
+                            binding.pageAll.visibility = View.VISIBLE
+                            if(!Util.isTextEmpty(next)){
+                                nextUrl = next
+                                binding.pageNext.visibility = View.VISIBLE
+                            }
+                        }
+                    }
+                    binding.toolbar.title.text = chapter
+                    binding.titlePage.text = Util.convertStringISOtoUTF8(titleComic!!)
+                    if(listPageChapter.size > 0){
+                        saveHistory()
+                    }
+                } else {
+
+                }
+            }
+
+            override fun onFailure(call: Call<ImageList>, t: Throwable) {
+
+            }
+        })
     }
 
     fun scrollTo(pos : Int){

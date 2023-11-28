@@ -75,7 +75,7 @@ class HomeComicAsyncTask : AsyncTask<String, Void, HomeComic>() {
             }
 //            Log.d("OkCheck","Type:"+type)
             var imgSrc = slideImage.getElementsByTag("img")[0].attr("src")
-            if(imgSrc.equals("")){
+            if(imgSrc.equals("") || imgSrc.contains("data:image")){
                 var noScript = slideImage.getElementsByTag("noscript")[0]
                 imgSrc = noScript.getElementsByTag("img")[0].attr("src")
             }
@@ -108,14 +108,16 @@ class HomeComicAsyncTask : AsyncTask<String, Void, HomeComic>() {
 //        Log.d("OkCon", "listUpdateItem "+listUpdateItem.size.toString())
         for(utao in listUpdateItem){
             var uta = utao.getElementsByClass("uta")[0]
-            var imgSrc = uta.getElementsByClass("data-tooltip")[0].getElementsByTag("img")[0].attr("src")
-            if(imgSrc.equals("")){
-                var noScript = uta.getElementsByClass("data-tooltip")[0].getElementsByTag("noscript")[0]
+            var tooltip = uta.getElementsByClass("data-tooltip")
+            var series = tooltip[0].allElements
+            var imgSrc = series[0].getElementsByTag("img")[0].attr("src")
+            if(imgSrc.equals("") || imgSrc.contains("data:image")){
+                var noScript = series[0].getElementsByTag("noscript")[0]
                 imgSrc = noScript.getElementsByTag("img")[0].attr("src")
             }
 //            Log.d("OkCon", imgSrc)
             var luf = uta.getElementsByClass("luf")[0]
-            var ul = uta.getElementsByClass("luf")[0].getElementsByTag("ul")
+            var ul = luf.getElementsByTag("ul")
             var type = ul[0].className()
 //            Log.d("OkCheck","Type:"+type)
             var title = luf.getElementsByTag("h3")[0].text()

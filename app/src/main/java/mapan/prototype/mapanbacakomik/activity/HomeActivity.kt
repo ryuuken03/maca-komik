@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.*
 import android.view.View
 import android.widget.Toast
-import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -21,14 +20,11 @@ import mapan.prototype.mapanbacakomik.api.RetrofitClient
 import mapan.prototype.mapanbacakomik.databinding.ActivityHomeBinding
 import mapan.prototype.mapanbacakomik.model.ComicThumbnail
 import mapan.prototype.mapanbacakomik.model.HomeComic
-import mapan.prototype.mapanbacakomik.model.ListComic
+import mapan.prototype.mapanbacakomik.model.api.Browse
 import mapan.prototype.mapanbacakomik.util.BaseActivity
 import mapan.prototype.mapanbacakomik.util.Log
 import mapan.prototype.mapanbacakomik.util.Util
 import mapan.prototype.mapanbacakomik.util.shared.SourceWebsitePreference
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,6 +39,8 @@ class HomeActivity : BaseActivity() {
     lateinit var fastAdapterPopular: FastAdapter<AdapterComicThumbnail>
     lateinit var adapterGenre: ItemAdapter<AdapterGenre>
     lateinit var fastAdapterGenre: FastAdapter<AdapterGenre>
+
+    var callbackGetHome: Call<Browse>? = null
     var service: APIHelper?= null
 
     var listPhotoGallery = ArrayList<AdapterComicThumbnail>()
@@ -63,6 +61,13 @@ class HomeActivity : BaseActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(callbackGetHome!=null){
+            callbackGetHome?.cancel()
+        }
     }
 
     override fun onResume() {
@@ -105,13 +110,6 @@ class HomeActivity : BaseActivity() {
                 binding.toolbar.iconOther.visibility = View.GONE
             }
         }
-//        if(typeSource == 0){
-//            title = "MACA Komikcast"
-//            sourceWeb = "https://komikcast.site/"
-//        }else if(typeSource == 1){
-//            title = "MACA Westmanga"
-//            sourceWeb = "https://westmanga.info/"
-//        }
         binding.toolbar.title.text = title
     }
 
@@ -170,12 +168,18 @@ class HomeActivity : BaseActivity() {
         binding.textDataNotFound.visibility = View.GONE
 
         var timer = 1000.toLong()
+        var isShow = true
         if(waitTime != null){
             timer = waitTime
+            if(waitTime == 0.toLong()){
+                isShow = false
+            }
         }
-        Handler().postDelayed(Runnable {
-            showData()
-        },timer)
+        if(isShow){
+            Handler().postDelayed(Runnable {
+                showData()
+            },timer)
+        }
     }
 
     fun showData(){
@@ -313,7 +317,7 @@ class HomeActivity : BaseActivity() {
 //                    binding.progressLoadMore.visibility = View.VISIBLE
 ////                    Handler().postDelayed(Runnable {
 //                        if(typeSource == 3){
-//                            loadMoreShinigamiID(currentPage+1)
+//                            loadShinigamiID(currentPage+1)
 //                        }else{
 //                            loadMore()
 //                        }
@@ -398,10 +402,15 @@ class HomeActivity : BaseActivity() {
                 var intent = Intent(this@HomeActivity, ListChapterPageActivity::class.java)
                 intent.putExtra("selectUrl",item.urlLastChapter)
                 intent.putExtra("title","Chapter " + item.lastChapter)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("allChapterUrl",item.link)
+                intent.putExtra("thumbnail",item.src)
                 startActivity(intent)
             }else{
                 var intent = Intent(this@HomeActivity, DetailComicActivity::class.java)
                 intent.putExtra("selectUrl",item.link)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("imgSrc",item.src)
                 startActivity(intent)
             }
             openCloseFAB()
@@ -419,10 +428,15 @@ class HomeActivity : BaseActivity() {
                 var intent = Intent(this@HomeActivity, ListChapterPageActivity::class.java)
                 intent.putExtra("selectUrl",item.urlLastChapter)
                 intent.putExtra("title","Chapter " + item.lastChapter)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("allChapterUrl",item.link)
+                intent.putExtra("thumbnail",item.src)
                 startActivity(intent)
             }else{
                 var intent = Intent(this@HomeActivity, DetailComicActivity::class.java)
                 intent.putExtra("selectUrl",item.link)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("imgSrc",item.src)
                 startActivity(intent)
             }
             openCloseFAB()
@@ -462,45 +476,119 @@ class HomeActivity : BaseActivity() {
     }
 
     fun loadData(){
+        if(typeSource == 3){
+            loadShinigamiID()
+        }else{
+            isReload = false
+            openCloseFAB()
+            showProgress()
+            currentPage = 1
+            isMax = false
+            adapter.clear()
+            adapterPopular.clear()
+            listPhotoGallery.clear()
+            listPhotoGalleryPopular.clear()
+            var url = sourceWeb
+            Log.d("OkCheck", "selectUrl:"+url)
+            var task = HomeComicAsyncTask()
+            resultTask = task.execute(url,typeSource.toString())?.get()
+            var end = 11
+            if(resultTask?.list!!.size < end){
+                end = resultTask?.list!!.size
+                if(end != 0){
+                    end --
+                }
+            }
+            Log.d("OkCheck", "end:"+end.toString())
+            if(end > 0){
+                for(i in  0 .. end){
+                    addDataAdapter(resultTask?.list!![i])
+                }
+            }
+            binding.scrollView.smoothScrollTo(0,0)
+            var endPopular = resultTask!!.popular!!.size-1
+            if(resultTask?.popular!!.size == 0){
+                endPopular = 0
+            }
+            if(endPopular > 0){
+                for(i in  0 .. endPopular){
+                    addDataAdapter(resultTask?.popular!![i],true)
+                }
+            }
+            adapterGenre.clear()
+            loadGenre()
+        }
+    }
+
+    fun loadShinigamiID(){
         isReload = false
         openCloseFAB()
-        showProgress()
+        showProgress(0)
         currentPage = 1
         isMax = false
         adapter.clear()
         adapterPopular.clear()
         listPhotoGallery.clear()
         listPhotoGalleryPopular.clear()
-        var url = sourceWeb
-        Log.d("OkCheck", "selectUrl:"+url)
-        var task = HomeComicAsyncTask()
-        resultTask = task.execute(url,typeSource.toString())?.get()
-//        for(i in  0 .. resultTask!!.list!!.size-1){
-        var end = 11
-        if(resultTask?.list!!.size < end){
-            end = resultTask?.list!!.size
-            if(end != 0){
-                end --
+        callbackGetHome  = service?.home()
+        callbackGetHome!!.enqueue(object : Callback<Browse> {
+            override fun onResponse(
+                call: Call<Browse>,
+                response: Response<Browse>
+            ) {
+                if (response.isSuccessful) {
+                    var tmp = response.body()!!
+                    var popular = tmp.hotList
+                    var list = tmp.newsList
+                    var end = 11
+                    if(list!!.size < end){
+                        end = list.size
+                        if(end != 0){
+                            end --
+                        }
+                    }
+                    Log.d("OkCheck", "end:"+end.toString())
+                    if(end > 0){
+                        for(i in  0 .. end){
+                            var data = list[i]
+                            var comic = ComicThumbnail()
+                            comic.id = i+1.toLong()
+                            comic.title = data.title
+                            comic.url = data.url
+                            comic.imgSrc = data.cover
+                            comic.lastChap = data.latestChapter
+                            comic.urlLastChap = data.latestChapterUrl
+                            addDataAdapter(comic)
+                        }
+                    }
+                    binding.scrollView.smoothScrollTo(0,0)
+                    var endPopular = popular!!.size-1
+                    if(popular.size == 0){
+                        endPopular = 0
+                    }
+                    if(endPopular > 0){
+                        for(i in  0 .. endPopular){
+                            var data = popular[i]
+                            var comic = ComicThumbnail()
+                            comic.id = i+1.toLong()
+                            comic.title = data.title
+                            comic.url = data.url
+                            comic.imgSrc = data.cover
+                            comic.lastChap = data.latestChapter
+                            comic.urlLastChap = data.latestChapterUrl
+                            addDataAdapter(comic,true)
+                        }
+                    }
+                    showData()
+                } else {
+                    showData()
+                }
             }
-        }
-        Log.d("OkCheck", "end:"+end.toString())
-        if(end > 0){
-            for(i in  0 .. end){
-                addDataAdapter(resultTask?.list!![i])
+
+            override fun onFailure(call: Call<Browse>, t: Throwable) {
+                showData()
             }
-        }
-        binding.scrollView.smoothScrollTo(0,0)
-        var endPopular = resultTask!!.popular!!.size-1
-        if(resultTask?.popular!!.size == 0){
-            endPopular = 0
-        }
-        if(endPopular > 0){
-            for(i in  0 .. endPopular){
-                addDataAdapter(resultTask?.popular!![i],true)
-            }
-        }
-        adapterGenre.clear()
-        loadGenre()
+        })
     }
 
     fun getDefaultIndex():String{

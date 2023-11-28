@@ -23,6 +23,7 @@ import mapan.prototype.mapanbacakomik.databinding.ActivityListComicNewBinding
 import mapan.prototype.mapanbacakomik.model.ComicThumbnail
 import mapan.prototype.mapanbacakomik.model.FilterComic
 import mapan.prototype.mapanbacakomik.model.ListComic
+import mapan.prototype.mapanbacakomik.model.api.Comic
 import mapan.prototype.mapanbacakomik.util.BaseActivity
 import mapan.prototype.mapanbacakomik.util.Log
 import mapan.prototype.mapanbacakomik.util.Util
@@ -60,6 +61,7 @@ class ListComicNewActivity : BaseActivity() {
     var canUseFilter = true
 
     var isError = false
+    var callbackGetList: Call<ArrayList<Comic>>? = null
     var service: APIHelper?= null
 
     var currentPage = 1
@@ -70,7 +72,12 @@ class ListComicNewActivity : BaseActivity() {
         val view = binding.root
         setContentView(view)
     }
-
+    override fun onDestroy() {
+        super.onDestroy()
+        if(callbackGetList!=null){
+            callbackGetList?.cancel()
+        }
+    }
     override fun onResume() {
         super.onResume()
         if(isFirst){
@@ -172,13 +179,19 @@ class ListComicNewActivity : BaseActivity() {
         binding.inputLinkLayout.visibility = View.GONE
 
         binding.inputLink.setText("")
+        var isShow = true
         var timer = 1000.toLong()
         if(waitTime != null){
             timer = waitTime
+            if(waitTime == 0.toLong()){
+                isShow = false
+            }
         }
-        Handler().postDelayed(Runnable {
-            showData()
-        },timer)
+        if(isShow){
+            Handler().postDelayed(Runnable {
+                showData()
+            },timer)
+        }
     }
 
     fun showData(){
@@ -356,7 +369,8 @@ class ListComicNewActivity : BaseActivity() {
                 if(adapter.adapterItemCount == lastPost+1){
                     if(!isMax){
                         if(typeSource == 3){
-                            loadMoreShinigamiID(currentPage+1)
+//                            loadMoreShinigamiID(currentPage+1)
+                            loadShinigamiID()
                         }else{
                             loadMore()
                         }
@@ -387,10 +401,15 @@ class ListComicNewActivity : BaseActivity() {
                 var intent = Intent(this@ListComicNewActivity, ListChapterPageActivity::class.java)
                 intent.putExtra("selectUrl",item.urlLastChapter)
                 intent.putExtra("title","Chapter " + item.lastChapter)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("allChapterUrl",item.link)
+                intent.putExtra("thumbnail",item.src)
                 startActivity(intent)
             }else{
                 var intent = Intent(this@ListComicNewActivity, DetailComicActivity::class.java)
                 intent.putExtra("selectUrl",item.link)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("imgSrc",item.src)
                 startActivity(intent)
             }
             false
@@ -624,57 +643,119 @@ class ListComicNewActivity : BaseActivity() {
     }
 
     fun loadData(){
-        showProgress()
-        adapter.clear()
-        listPhotoGallery.clear()
-        currentPage = 1
-        isMax = false
-        var url = sourceWeb+getDefaultIndex()
-
-//        if(canUseFilter){
+        if(typeSource == 3){
+            loadShinigamiID(true)
+        }else{
+            showProgress()
+            adapter.clear()
+            listPhotoGallery.clear()
+            currentPage = 1
+            isMax = false
+            var url = sourceWeb+getDefaultIndex()
             url+=getUrlSeleted()
-//        }
-        if(selectUrl != null){
-            url = selectUrl!!
-        }else{
-            selectUrl = url
-        }
-        Log.d("OkCheck", "selectUrl:"+url)
-        var task = ListComicAsyncTask()
-        resultTask = task.execute(url,typeSource.toString())?.get()
-        if(resultTask?.isSuccessed!!){
-            for(i in  0 .. resultTask!!.list!!.size-1){
-                addDataAdapter(resultTask?.list!![i])
+            if(selectUrl != null){
+                url = selectUrl!!
+            }else{
+                selectUrl = url
             }
-            listGenre = resultTask?.genres!!
-            listType = resultTask?.types!!
-            if(listType.size> 0 ){
-                if(selectType.size == 0){
-                    selectType.add(listType[0].id!!)
+            Log.d("OkCheck", "selectUrl:"+url)
+            var task = ListComicAsyncTask()
+            resultTask = task.execute(url,typeSource.toString())?.get()
+            if(resultTask?.isSuccessed!!){
+                for(i in  0 .. resultTask!!.list!!.size-1){
+                    addDataAdapter(resultTask?.list!![i])
                 }
-            }
-            listOrderBy = resultTask?.orderbys!!
-            if(listOrderBy.size> 0 ){
-                if(selectOrderBy.size == 0){
-                    selectOrderBy.add(listOrderBy[2].id!!)
+                listGenre = resultTask?.genres!!
+                listType = resultTask?.types!!
+                if(listType.size> 0 ){
+                    if(selectType.size == 0){
+                        selectType.add(listType[0].id!!)
+                    }
                 }
+                listOrderBy = resultTask?.orderbys!!
+                if(listOrderBy.size> 0 ){
+                    if(selectOrderBy.size == 0){
+                        selectOrderBy.add(listOrderBy[2].id!!)
+                    }
+                }
+            }else{
+                isError = true
             }
-        }else{
-            isError = true
-        }
-        if(adapter.adapterItemCount > 0 && adapter.adapterItemCount < 9){
-            if(!isMax){
-                if(typeSource == 3){
+            if(adapter.adapterItemCount > 0 && adapter.adapterItemCount < 9){
+                if(!isMax){
+                    if(typeSource == 3){
 //                    if(adapter.adapterItemCount == 10){
-//                        loadMoreShinigamiID(currentPage+1)
+//                        loadShinigamiID(currentPage+1)
 //                    }
-                }else{
-                    if(typeSource != 0){
-                        loadMore()
+                    }else{
+                        if(typeSource != 0){
+                            loadMore()
+                        }
                     }
                 }
             }
         }
+
+    }
+
+    fun loadShinigamiID(isReset : Boolean = false){
+        if(isReset){
+            showProgress(0)
+            currentPage = 1
+            isMax = false
+            adapter.clear()
+            listPhotoGallery.clear()
+        }else{
+            currentPage++
+        }
+        if(search!=null){
+            callbackGetList  = service?.loadComicListSearch(search!!,currentPage)
+        }else{
+            callbackGetList  = service?.loadComicList(currentPage)
+        }
+        callbackGetList!!.enqueue(object : Callback<ArrayList<Comic>> {
+            override fun onResponse(
+                call: Call<ArrayList<Comic>>,
+                response: Response<ArrayList<Comic>>
+            ) {
+                if (response.isSuccessful) {
+                    var tmp = response.body()!!
+                    for(i in  0 .. tmp.size-1){
+                        var data = tmp[i]
+                        var comic = ComicThumbnail()
+                        comic.id = i+1.toLong()
+                        comic.title = data.title
+                        comic.url = data.url
+                        comic.imgSrc = data.cover
+                        comic.lastChap = data.latestChapter
+                        comic.urlLastChap = data.latestChapterUrl
+                        addDataAdapter(comic)
+                    }
+                    if(isReset){
+                        showData()
+                        binding.revListData.scrollToPosition(0)
+                    }else{
+                        if(tmp.size == 0){
+                            isMax = true
+                        }
+                    }
+                } else {
+                    if(!isReset){
+                        isMax = true
+                    }else{
+                        showData()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ArrayList<Comic>>, t: Throwable) {
+                if(!isReset){
+                    isMax = true
+                }else{
+                    showData()
+                }
+            }
+        })
     }
 
     fun loadMore(){

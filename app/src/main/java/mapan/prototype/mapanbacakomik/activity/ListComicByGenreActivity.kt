@@ -252,10 +252,15 @@ class ListComicByGenreActivity : BaseActivity() {
                 var intent = Intent(this@ListComicByGenreActivity, ListChapterPageActivity::class.java)
                 intent.putExtra("selectUrl",item.urlLastChapter)
                 intent.putExtra("title","Chapter " + item.lastChapter)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("allChapterUrl",item.link)
+                intent.putExtra("thumbnail",item.src)
                 startActivity(intent)
             }else{
                 var intent = Intent(this@ListComicByGenreActivity, DetailComicActivity::class.java)
                 intent.putExtra("selectUrl",item.link)
+                intent.putExtra("titleComic",item.title)
+                intent.putExtra("imgSrc",item.src)
                 startActivity(intent)
             }
             false
