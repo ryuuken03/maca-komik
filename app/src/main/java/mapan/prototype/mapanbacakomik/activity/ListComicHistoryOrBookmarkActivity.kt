@@ -17,6 +17,7 @@ import io.realm.Realm
 import io.realm.Sort
 import mapan.prototype.mapanbacakomik.R
 import mapan.prototype.mapanbacakomik.adapter.AdapterComicHistoryOrBookmark
+import mapan.prototype.mapanbacakomik.config.Constants
 import mapan.prototype.mapanbacakomik.databinding.ActivityListComicHistoryBinding
 import mapan.prototype.mapanbacakomik.databinding.ItemAdapterComicHistoryOrBookmarkBinding
 import mapan.prototype.mapanbacakomik.model.realm.ComicHistory
@@ -336,10 +337,17 @@ class ListComicHistoryOrBookmarkActivity : BaseActivity() {
         data.title = chapter.title
         data.typeComic = chapter.type
         data.genre = chapter.genre
-        data.imgSrc = chapter.imgSrc
+//        data.imgSrc = chapter.imgSrc
+        if(chapter.imgSrc!=null){
+            data.imgSrc = Constants.getRecentURL(chapter.imgSrc!!)
+        }
         data.lastChapter = chapter.chapter
-        data.urlLastChapter = chapter.urlChapter
-        data.urlDetailComic = chapter.urlDetail
+        if(chapter.urlChapter!=null){
+            data.urlLastChapter = Constants.getRecentURL(chapter.urlChapter!!)
+        }
+        if(chapter.urlChapter!=null){
+            data.urlDetailComic = Constants.getRecentURL(chapter.urlDetail!!)
+        }
         data.isBookmark = true
         var sourceUrls = resources.getStringArray(R.array.source_website_url)
         var sourceTitles = resources.getStringArray(R.array.source_website_title)

@@ -28,15 +28,11 @@
     </string-array>
 
     <string-array name="source_website_url">
-<!--        <item>https://komikcast.site/</item>-->
-<!--        <item>https://komikcast.io/</item>-->
-<!--        <item>https://komikcast.vip/</item>-->
-        <item>https://komikcast.ch/</item>
+        <item>https://komikcast.lol/</item>
         <item>https://westmanga.org/</item>
         <item>https://ngomik.net/</item>
-<!--        <item>https://shinigami.id/</item>-->
-<!--        <item>https://shinigami.ae/</item>-->
-        <item>https://shinigami.sh/</item>
+<!--        <item>https://shinigami.sh/</item>-->
+        <item>https://shinigami.moe/</item>
     </string-array>
 
     <string-array name="source_website_image_not_found">

@@ -254,7 +254,11 @@ class ListComicProjectActivity : BaseActivity() {
             if(isLastChapter){
                 var intent = Intent(this@ListComicProjectActivity, ListChapterPageActivity::class.java)
                 intent.putExtra("selectUrl",item.urlLastChapter)
-                intent.putExtra("title","Chapter " + item.lastChapter)
+                intent.putExtra("title",
+                    (if(item.lastChapter!!.contains("chapter",true))
+                        ""
+                    else "Chapter ") +item.lastChapter)
+//                intent.putExtra("title","Chapter " + item.lastChapter)
                 intent.putExtra("titleComic",item.title)
                 intent.putExtra("allChapterUrl",item.link)
                 intent.putExtra("thumbnail",item.src)

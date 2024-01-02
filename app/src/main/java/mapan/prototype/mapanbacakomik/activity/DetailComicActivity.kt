@@ -329,10 +329,12 @@ class DetailComicActivity : BaseActivity() {
 
     fun loadData(){
         var type = "0"
-        var sourceUrls = resources.getStringArray(R.array.source_website_url)
+//        var sourceUrls = resources.getStringArray(R.array.source_website_url)
+        var sourceTitles = resources.getStringArray(R.array.source_website_title)
         var index = 0
-        for(source in sourceUrls){
-            if(selectUrl!!.contains(source,true)){
+//        for(source in sourceUrls){
+        for(source in sourceTitles){
+            if(selectUrl!!.contains(source.lowercase(),true)){
                 type = index.toString()
                 break
             }

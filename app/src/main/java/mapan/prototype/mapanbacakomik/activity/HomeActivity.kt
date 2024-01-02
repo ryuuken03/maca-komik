@@ -401,7 +401,11 @@ class HomeActivity : BaseActivity() {
             if(isLastChapter){
                 var intent = Intent(this@HomeActivity, ListChapterPageActivity::class.java)
                 intent.putExtra("selectUrl",item.urlLastChapter)
-                intent.putExtra("title","Chapter " + item.lastChapter)
+                intent.putExtra("title",
+                    (if(item.lastChapter!!.contains("chapter",true))
+                        ""
+                    else "Chapter ") +item.lastChapter)
+//                intent.putExtra("title",item.lastChapter)
                 intent.putExtra("titleComic",item.title)
                 intent.putExtra("allChapterUrl",item.link)
                 intent.putExtra("thumbnail",item.src)
@@ -427,7 +431,11 @@ class HomeActivity : BaseActivity() {
             if(isLastChapter){
                 var intent = Intent(this@HomeActivity, ListChapterPageActivity::class.java)
                 intent.putExtra("selectUrl",item.urlLastChapter)
-                intent.putExtra("title","Chapter " + item.lastChapter)
+                intent.putExtra("title",
+                    (if(item.lastChapter!!.contains("chapter",true))
+                        ""
+                    else "Chapter ") +item.lastChapter)
+//                intent.putExtra("title",item.lastChapter)
                 intent.putExtra("titleComic",item.title)
                 intent.putExtra("allChapterUrl",item.link)
                 intent.putExtra("thumbnail",item.src)
@@ -448,9 +456,10 @@ class HomeActivity : BaseActivity() {
         setSource()
         if(adapter.adapterItemCount > 0){
             showProgress(100)
-        }else{
-            loadData()
         }
+//        else{
+//            loadData()
+//        }
     }
 
     fun loadGenre(){
@@ -528,6 +537,7 @@ class HomeActivity : BaseActivity() {
         isMax = false
         adapter.clear()
         adapterPopular.clear()
+        adapterGenre.clear()
         listPhotoGallery.clear()
         listPhotoGalleryPopular.clear()
         callbackGetHome  = service?.home()

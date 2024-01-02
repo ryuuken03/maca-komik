@@ -2,6 +2,7 @@ package mapan.prototype.mapanbacakomik.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.view.View
 import android.widget.Toast
@@ -9,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.postDelayed
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import io.realm.Realm
@@ -66,6 +68,7 @@ class ListChapterPageActivity : BaseActivity() {
     var loadPage = 0
     var perLoadPage = 3
     var detailComicShinigami : DetailComic?= null
+    var isFirstScroll = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityListChapterPageBinding.inflate(layoutInflater)
@@ -121,7 +124,7 @@ class ListChapterPageActivity : BaseActivity() {
         binding.revListData.layoutManager = LinearLayoutManager(this)
         binding.revListData.adapter = fastAdapter
         binding.revListData.animation = null
-        binding.revListData.isNestedScrollingEnabled = false
+        binding.revListData.isNestedScrollingEnabled = true
 //        var snapHelper = LinearSnapHelper()
 //        snapHelper.attachToRecyclerView(binding.revListData)
         loadData()
@@ -132,7 +135,7 @@ class ListChapterPageActivity : BaseActivity() {
         binding.titlePage.visibility = View.GONE
         binding.layoutNavControll.visibility = View.GONE
         binding.revListData.visibility = View.GONE
-        binding.fastscroller.visibility = View.GONE
+        binding.layoutData.visibility = View.GONE
         binding.showNavbar.visibility = View.GONE
         binding.progress.visibility = View.VISIBLE
 
@@ -146,7 +149,7 @@ class ListChapterPageActivity : BaseActivity() {
                 showData()
             },timer)
         }else{
-            binding.fastscroller.visibility = View.INVISIBLE
+            binding.layoutData.visibility = View.INVISIBLE
             binding.revListData.visibility = View.VISIBLE
         }
     }
@@ -154,44 +157,44 @@ class ListChapterPageActivity : BaseActivity() {
     fun showData(){
         binding.titlePage.visibility = View.VISIBLE
         binding.layoutNavControll.visibility = View.VISIBLE
-        binding.fastscroller.visibility = View.VISIBLE
+        binding.layoutData.visibility = View.VISIBLE
         binding.progress.visibility = View.GONE
     }
 
     fun setupSwipeRefresh() {
-//        try {
-//            binding.swipeRefresh.setOnRefreshListener(object :
-//                SwipeRefreshLayout.OnRefreshListener {
-//                override fun onRefresh() {
-//                    firstPos = 0
-//                    loadData()
-//
-//                    object : CountDownTimer(2000, 1000) {
-//                        override fun onTick(millisUntilFinished: Long) {
-//                            try{
-//                                binding.swipeRefresh.setRefreshing(false)
-//                            }catch (e : Exception){
-//                            }catch (e : KotlinNullPointerException){
-//                            }
-//                        }
-//
-//                        override fun onFinish() {
-//                            try{
-//                                binding.swipeRefresh.setRefreshing(false)
-//                            }catch (e : Exception){
-//                            }catch (e : KotlinNullPointerException){
-//                            }
-//                        }
-//                    }.start()
-//                }
-//            })
-//        } catch (e: Exception) {
-//        } catch (e: KotlinNullPointerException) {
-//        }
+        try {
+            binding.swipeRefresh.setOnRefreshListener(object :
+                SwipeRefreshLayout.OnRefreshListener {
+                override fun onRefresh() {
+                    firstPos = 0
+                    loadData()
+
+                    object : CountDownTimer(2000, 1000) {
+                        override fun onTick(millisUntilFinished: Long) {
+                            try{
+                                binding.swipeRefresh.setRefreshing(false)
+                            }catch (e : Exception){
+                            }catch (e : KotlinNullPointerException){
+                            }
+                        }
+
+                        override fun onFinish() {
+                            try{
+                                binding.swipeRefresh.setRefreshing(false)
+                            }catch (e : Exception){
+                            }catch (e : KotlinNullPointerException){
+                            }
+                        }
+                    }.start()
+                }
+            })
+        } catch (e: Exception) {
+        } catch (e: KotlinNullPointerException) {
+        }
     }
 
     override fun setListener() {
-//        setupSwipeRefresh()
+        setupSwipeRefresh()
         binding.toolbar.btnBack.setOnClickListener {
             finish()
         }
@@ -339,6 +342,8 @@ class ListChapterPageActivity : BaseActivity() {
     fun checkIsSave() : Int{
         binding.btnScrollToBookmark.visibility = View.GONE
         var result = 0
+        Log.d("OkCheck","urlDetail:"+allChapterUrl)
+        Log.d("OkCheck","selectUrl:"+selectUrl)
         val detailChapter = realm!!.where(ComicSave::class.java).equalTo("urlDetail", allChapterUrl).findFirst()
         if(detailChapter!= null){
             result = 1
@@ -363,6 +368,7 @@ class ListChapterPageActivity : BaseActivity() {
     fun saveHistory(){
         var type = "0"
         var sourceUrls = resources.getStringArray(R.array.source_website_url)
+        var sourceTitles = resources.getStringArray(R.array.source_website_title)
         var index = 0
         var titleComic = binding.titlePage.text.toString()
         var genreComic = "-"
@@ -373,8 +379,9 @@ class ListChapterPageActivity : BaseActivity() {
                 thumbComic = thumbnail
             }
         }
-        for(source in sourceUrls){
-            if(allChapterUrl!!.contains(source,true)){
+//        for(source in sourceUrls){
+        for(source in sourceTitles){
+            if(allChapterUrl!!.contains(source.lowercase(),true)){
                 type = index.toString()
                 break
             }
@@ -468,7 +475,8 @@ class ListChapterPageActivity : BaseActivity() {
     fun parsingDetailComic(urlDetail:String){
         showProgress()
         var type = "0"
-        var sourceUrls = resources.getStringArray(R.array.source_website_url)
+//        var sourceUrls = resources.getStringArray(R.array.source_website_url)
+        var sourceTitles = resources.getStringArray(R.array.source_website_title)
         var index = 0
         var titleComic = binding.titlePage.text.toString()
         var genreComic = "-"
@@ -479,8 +487,9 @@ class ListChapterPageActivity : BaseActivity() {
                 thumbComic = thumbnail
             }
         }
-        for(source in sourceUrls){
-            if(urlDetail.contains(source,true)){
+//        for(source in sourceUrls){
+        for(source in sourceTitles){
+            if(urlDetail.contains(source.lowercase(),true)){
                 type = index.toString()
                 break
             }
@@ -589,10 +598,15 @@ class ListChapterPageActivity : BaseActivity() {
 
     fun loadData(){
         var type = "0"
-        var sourceUrls = resources.getStringArray(R.array.source_website_url)
+//        var sourceUrls = resources.getStringArray(R.array.source_website_url)
+        var sourceUrls = resources.getStringArray(R.array.source_website_title)
         var index = 0
         for(source in sourceUrls){
-            if(selectUrl!!.contains(source,true)){
+//            if(selectUrl!!.contains(source,true)){
+//                type = index.toString()
+//                break
+//            }
+            if(selectUrl!!.contains(source.lowercase(),true)){
                 type = index.toString()
                 break
             }
@@ -719,6 +733,7 @@ class ListChapterPageActivity : BaseActivity() {
                             }
                         }
                     }
+                    showBookmark()
                     binding.toolbar.title.text = chapter
                     binding.titlePage.text = Util.convertStringISOtoUTF8(titleComic!!)
                     if(listPageChapter.size > 0){
@@ -737,10 +752,18 @@ class ListChapterPageActivity : BaseActivity() {
 
     fun scrollTo(pos : Int){
         binding.toolbar.chapterPage.text = (pos+1).toString()+" / "+maxPage
-        binding.revListData.post{
+//        binding.revListData.post{
 //            binding.revListData.scrollToPosition(pos)
-            binding.revListData.smoothScrollToPosition(pos)
-        }
+//        var index = pos
+//        if(isFirstScroll){
+//            if(pos > 0){
+//                index --
+//                isFirstScroll = false
+//            }
+//        }
+//            binding.revListData.smoothScrollToPosition(index)
+            binding.revListData.scrollToPosition(pos)
+//        }
 //        Handler().postDelayed(Runnable {
 //            binding.revListData.onScrollStateChanged(RecyclerView.SCROLL_STATE_SETTLING)
 //            binding.revListData.scrollToPosition(pos)
